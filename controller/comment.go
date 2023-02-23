@@ -30,7 +30,7 @@ func CommentAction(c *gin.Context) {
 
 	if exist {
 		text := c.Query("comment_text")
-		videoId, _ := strconv.Atoi(c.Query("video_id"))
+		videoId, _ := strconv.ParseInt(c.Query("video_id"), 0, 64)
 
 		comment := class.Comment{
 			GormComment: class.GormComment{
@@ -63,8 +63,8 @@ func CommentAction(c *gin.Context) {
 
 			return
 		} else if actionType == 2 { // 删除评论
-			commentId, _ := strconv.Atoi(c.Query("comment_id"))
-			comment.Id = int64(commentId)
+			comment.Id, _ = strconv.ParseInt(c.Query("comment_id"), 0, 64)
+			fmt.Println(comment.Id)
 			// 删除comment到数据库
 			if _, err := sql.ReviseComment(comment); err != nil {
 				c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "删除失败"})
@@ -75,7 +75,6 @@ func CommentAction(c *gin.Context) {
 			return
 		}
 	} else {
-		fmt.Println(1)
 		c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
 	}

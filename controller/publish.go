@@ -110,6 +110,9 @@ func Publish(c *gin.Context) {
 		return
 	}
 
+	// 修改作品数目(+1)
+	sql.InsertUserPublicCount(user.Id, true)
+
 	c.JSON(http.StatusOK, class.Response{
 		StatusCode: 0,
 		StatusMsg:  finalName + " uploaded successfully",

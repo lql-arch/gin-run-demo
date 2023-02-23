@@ -27,9 +27,7 @@ func FindComments(videoId int, token string) (comments []class.JsonComment) {
 	}
 
 	for i := range comments {
-		if comments[i].Id == 0 {
-			comments[i].Id = comments[i].CId
-		}
+		comments[i].Id = comments[i].CId
 
 		user, ok := users[comments[i].Id] // 自己与目标用户关系
 		if !ok {
@@ -49,6 +47,8 @@ func FindComments(videoId int, token string) (comments []class.JsonComment) {
 		}
 	}
 
+	//fmt.Println(comments)
+
 	if result.Error != nil {
 		log.Println(result.Error)
 	}
@@ -59,6 +59,7 @@ func FindComments(videoId int, token string) (comments []class.JsonComment) {
 func ReviseComment(comment class.Comment) (int64, error) {
 	tx := getDB()
 	var err error
+
 	if comment.Type == 1 { // 添加
 		err = tx.Create(&comment).Error
 	} else { // 删除

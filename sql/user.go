@@ -2,6 +2,7 @@ package sql
 
 import (
 	"douSheng/class"
+	"gorm.io/gorm"
 )
 
 // FindUser 根据token取出User
@@ -64,4 +65,24 @@ func CheckUser(userId int64, token string) error {
 	err := db.Where("id = ? AND token = ?", userId, token).Find(&class.User{}).Error
 
 	return err
+}
+
+func GetUserIdByVideoId(id int64) class.User {
+	var user class.User
+	var userVideo class.UserVideoFavorite
+
+	db.Select("token").Where("video_id = ?", id).Find(&userVideo)
+	db.Select("id").Where("token = ?", userVideo.Token).Find(&user)
+
+	return user
+}
+
+func InsertUserPublicCount(id int64, flag bool) {
+
+	if flag { // 增加
+		db.Model(&class.User{}).Where("id = ?", id).Update("total_favorited", gorm.Expr("total_favorited + 1"))
+	} else { // 删除
+		db.Model(&class.User{}).Where("id = ?", id).Update("total_favorited", gorm.Expr("total_favorited - 1"))
+	}
+
 }

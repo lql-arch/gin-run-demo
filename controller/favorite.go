@@ -11,7 +11,7 @@ import (
 
 func FavoriteAction(c *gin.Context) {
 	token := c.Query("token")
-	videoID, _ := strconv.Atoi(c.Query("video_id"))
+	videoID, _ := strconv.ParseInt(c.Query("video_id"), 0, 64)
 	actionType, _ := strconv.Atoi(c.Query("action_type"))
 
 	if _, exist := sql.FindUser(token); !exist {

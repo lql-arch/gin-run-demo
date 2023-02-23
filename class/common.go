@@ -26,11 +26,11 @@ type Video struct {
 }
 
 type GormComment struct {
-	Id        int64  `json:"comment_id,omitempty" gorm:"column:id"`
+	Id        int64  `json:"id,omitempty" gorm:"column:id"`
 	UserToken string `json:"user_token"`                                         //sql
 	Author    User   `json:"user" gorm:"foreignKey:token;references:user_token"` // 评论用户信息
 	Content   string `json:"content,omitempty"`                                  // 评论内容
-	VideoId   int    `json:"id"`                                                 // 视频评论id
+	VideoId   int64  `json:"video_id"`                                           // 视频评论id
 	Type      int    `json:"type"`                                               // 2删除或1创建
 	CId       int64  `gorm:"<-:false" json:"c_id"`                               //只读,禁止写
 }

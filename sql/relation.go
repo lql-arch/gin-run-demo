@@ -2,7 +2,6 @@ package sql
 
 import (
 	"douSheng/class"
-	"fmt"
 	"gorm.io/gorm"
 	"log"
 )
@@ -85,12 +84,11 @@ func FindFollowUsers(userId int64, token string) (users []class.User) {
 		Joins("left join relation r on user.id = r.other_user_id").
 		Where("my_id = ? and r.state = ?", userId, 1).Find(&users)
 
+	Reset()
 	for i := range users {
 		follows[users[i].Id] = struct{}{}
 		users[i].IsFollow = true
 	}
-
-	fmt.Println(users)
 
 	return users
 }

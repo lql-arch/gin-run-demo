@@ -1,12 +1,11 @@
 package main
 
 import (
-	"douSheng/service"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	go service.RunMessageServer()
+	//go kClient.KClient()
 
 	r := gin.Default()
 

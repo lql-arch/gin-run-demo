@@ -40,7 +40,7 @@ func RelationAction(c *gin.Context) {
 }
 
 func FollowList(c *gin.Context) {
-	userId, _ := strconv.Atoi(c.Query("user_id"))
+	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
 	token := c.Query("token")
 
 	c.JSON(http.StatusOK, UserListResponse{
@@ -52,7 +52,7 @@ func FollowList(c *gin.Context) {
 }
 
 func FollowerList(c *gin.Context) {
-	userId, _ := strconv.Atoi(c.Query("user_id"))
+	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
 	token := c.Query("token")
 
 	c.JSON(http.StatusOK, UserListResponse{
@@ -65,7 +65,7 @@ func FollowerList(c *gin.Context) {
 
 // FriendList 好友 : 我关注且关注我的
 func FriendList(c *gin.Context) {
-	userId, _ := strconv.Atoi(c.Query("user_id"))
+	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
 	token := c.Query("token")
 
 	c.JSON(http.StatusOK, UserFriendListResponse{

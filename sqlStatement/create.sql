@@ -26,12 +26,18 @@ create table message
 
 create table user
 (
-    id             int auto_increment
+    id               int auto_increment
         primary key,
-    name           longtext     not null,
-    follow_count   bigint       not null,
-    follower_count bigint       not null,
-    token          varchar(100) not null
+    name             longtext         not null,
+    follow_count     bigint           not null,
+    follower_count   bigint           not null,
+    token            varchar(100)     not null,
+    background_image varchar(100)     not null,
+    avatar           varchar(100)     not null,
+    signature        varchar(100)     not null,
+    total_favorited  bigint default 0 not null,
+    work_count       bigint default 0 not null,
+    favorite_count   bigint default 0 not null
 );
 
 create table user_video

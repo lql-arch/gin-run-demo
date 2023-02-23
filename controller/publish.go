@@ -67,8 +67,19 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	//保存封面
-	tmpCover, _ := GetSnapshot(saveFile, filename, 1)
+	//保存封面并且判断是否是视频
+	tmpCover, err := GetSnapshot(saveFile, filename, 1)
+	if err != nil { // 如果无法截图就说明文件有误
+		log.Println(err)
+		if err = os.Remove(saveFile); err != nil {
+			log.Println(err)
+		}
+		c.JSON(http.StatusOK, class.Response{
+			StatusCode: 0,
+			StatusMsg:  finalName + "不正确,请确认文件类型",
+		})
+		return
+	}
 	CoverPath := Const.Url + "/jpg/" + tmpCover
 
 	filePath := Const.Url + "/static/" + finalName

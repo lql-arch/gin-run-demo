@@ -34,12 +34,12 @@ func ReadVideos(latestTime int64, token string) ([]class.Video, int64) {
 	// 随机取30个视频,不足则乱序取全部
 	if setting.VideoIds < 30 {
 		db.Table("videos v").Preload("Author").
-			Select("v.id,v.`author_id`,v.`play_url`,v.`cover_url`,v.`favorite_count`,v.`comment_count`,v.title,v.create_at,v.update_at,u.id as uid,u.name,u.follow_count,u.follower_count,u.token").
+			Select("v.id,v.`author_id`,v.`play_url`,v.`cover_url`,v.`favorite_count`,v.`comment_count`,v.title,v.create_at,v.update_at,u.id as uid,u.name,u.follow_count,u.follower_count,u.token,u.background_image,u.avatar,u.signature,u.total_favorited,u.work_count,u.favorite_count").
 			Joins("left join user u on v.author_id = u.id").
 			Where("update_at <= ?", latestTime).Order("rand()").Find(&videos)
 	} else {
 		db.Table("videos v").Preload("Author").
-			Select("v.id,v.`author_id`,v.`play_url`,v.`cover_url`,v.`favorite_count`,v.`comment_count`,v.title,v.create_at,v.update_at,u.id as uid,u.name,u.follow_count,u.follower_count,u.token").
+			Select("v.id,v.`author_id`,v.`play_url`,v.`cover_url`,v.`favorite_count`,v.`comment_count`,v.title,v.create_at,v.update_at,u.id as uid,u.name,u.follow_count,u.follower_count,u.token,u.background_image,u.avatar,u.signature,u.total_favorited,u.work_count,u.favorite_count").
 			Joins("left join user u on v.author_id = u.id").
 			Where("update_at <= ?", latestTime).Order("rand()").Limit(30).Find(&videos)
 	}

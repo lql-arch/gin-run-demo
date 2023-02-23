@@ -3,6 +3,7 @@ package controller
 import (
 	"douSheng/class"
 	"douSheng/sql"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -23,6 +24,10 @@ func Feed(c *gin.Context) {
 	}
 
 	list, nextTime := sql.ReadVideos(latestTime, token)
+	for _, x := range list {
+		fmt.Println(x)
+	}
+
 	if nextTime == 0 {
 		nextTime = time.Now().Unix()
 	}

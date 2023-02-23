@@ -25,11 +25,12 @@ public_videos/
 example_con/
 test/
 Const/
-kitex/
+kitexService/
+service/message.go
 
 sqlStatement/select.sql
-simple-demo
 Dockerfile
+test/douSheng
 
 
 .idea

@@ -50,7 +50,7 @@ func MessageAction(c *gin.Context) {
 
 	if user, exist := sql.FindUser(token); exist {
 		userId := c.Query("to_user_id")
-		toUserId, _ := strconv.Atoi(userId)
+		toUserId, _ := strconv.ParseInt(userId, 0, 64)
 		actionType, _ := strconv.Atoi(c.Query("action_type"))
 
 		times := time.Now().Unix()
@@ -59,7 +59,7 @@ func MessageAction(c *gin.Context) {
 
 		if actionType == 1 { // 1-发送消息
 			message := class.Message{
-				MyId:     int(user.Id),
+				MyId:     user.Id,
 				Message:  content,
 				ToUserId: toUserId,
 				CreateAt: times,

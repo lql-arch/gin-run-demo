@@ -36,14 +36,20 @@ func Info() map[string]class.User {
 }
 
 // InsertUser 添加数据到数据库
-func InsertUser(user []class.User) error {
-	result := db.Create(user)
+func InsertUser(users []class.User) ([]int64, error) {
+	result := db.Create(&users)
 
 	if result.RowsAffected == 0 {
-		return result.Error
+		return nil, result.Error
 	}
 
-	return nil
+	var ids []int64
+
+	for _, user := range users {
+		ids = append(ids, user.Id)
+	}
+
+	return ids, nil
 }
 
 func GetUserByToken(token string) class.User {
@@ -53,7 +59,7 @@ func GetUserByToken(token string) class.User {
 	return user
 }
 
-func CheckUser(userId int, token string) error {
+func CheckUser(userId int64, token string) error {
 
 	err := db.Where("id = ? AND token = ?", userId, token).Find(&class.User{}).Error
 

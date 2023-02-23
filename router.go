@@ -6,7 +6,7 @@ import (
 )
 
 func initRouter(r *gin.Engine) {
-	// public_videos directory is used to serve static resources
+	// public_videos and public_cover directory is used to serve static resources
 	r.Static("/static", "./public_videos") // 视频
 	r.Static("/jpg", "./public_cover")     // 封面
 

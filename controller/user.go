@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"sync/atomic"
+	"strings"
 )
 
 type UserLoginResponse struct {
@@ -26,25 +26,35 @@ func Register(c *gin.Context) {
 	password := c.Query("password")
 
 	token := username + password
+	token = ReplaceToken(token)
 
 	if _, exist := sql.FindUser(token); exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: class.Response{StatusCode: 1, StatusMsg: "User already exist"},
+			Response: class.Response{
+				StatusCode: 1,
+				StatusMsg:  "User already exist",
+			},
 		})
 	} else {
-		userIdSequence := sql.FindUserIdSequence()
-		atomic.AddInt64(&userIdSequence, 1)
 		newUser := []class.User{
 			{
-				Name:  username,
-				Token: token,
+				Name:            username,
+				Token:           token,
+				FollowCount:     0,
+				FollowerCount:   0,
+				BackgroundImage: "http://192.168.104.60:8080/jpg/bronya.jpg",
+				Signature:       "这个人啥都没有",
+				Avatar:          "http://192.168.104.60:8080/jpg/bronya.jpg",
+				TotalFavorite:   0,
+				WorkCount:       0,
+				FavoriteCount:   0,
 			},
 		}
-		_ = sql.InsertUser(newUser)
+		ids, _ := sql.InsertUser(newUser)
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: class.Response{StatusCode: 0},
-			UserId:   userIdSequence,
-			Token:    username + password,
+			UserId:   ids[0],
+			Token:    token,
 		})
 	}
 }
@@ -54,6 +64,7 @@ func Login(c *gin.Context) {
 	password := c.Query("password")
 
 	token := username + password
+	token = ReplaceToken(token)
 
 	if user, exist := sql.FindUser(token); exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
@@ -73,7 +84,6 @@ func Login(c *gin.Context) {
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
-
 	user, exist := sql.FindUser(token)
 	if !exist {
 		c.JSON(http.StatusOK, UserResponse{
@@ -94,4 +104,14 @@ func UserInfo(c *gin.Context) {
 		User:     user,
 	})
 
+}
+
+func ReplaceToken(token string) string {
+	var str strings.Builder
+
+	for i, x := range token {
+		str.WriteByte(byte(x - int32(i)))
+	}
+
+	return str.String()
 }

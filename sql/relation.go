@@ -30,14 +30,14 @@ func RelationAction(myToken string, toUserId int64, state int) error {
 
 	var relation = class.Relation{
 		MyId:        user.Id,
-		OtherUserId: int64(toUserId),
+		OtherUserId: toUserId,
 		State:       state,
 	}
 
 	if IsRelationExist(relation) {
 		err = db.Where(&class.Relation{
 			MyId:        user.Id,
-			OtherUserId: int64(toUserId),
+			OtherUserId: toUserId,
 		}).Updates(&class.Relation{
 			State: state,
 		}).Error
@@ -66,13 +66,13 @@ func IsRelationExist(relation class.Relation) bool {
 	return true
 }
 
-func FindFollowUsers(userId int, token string) (users []class.User) {
+func FindFollowUsers(userId int64, token string) (users []class.User) {
 	if err := CheckUser(userId, token); err != nil {
 		log.Println(err)
 		return nil
 	}
 
-	db.Select("`user`.`id`,`user`.`name`,`user`.`follow_count`,`user`.`follower_count`,`user`.`token`").
+	db.Select("`user`.*").
 		Joins("left join relation r on user.id = r.other_user_id").
 		Where("my_id = ?", userId).Find(&users)
 
@@ -84,7 +84,7 @@ func FindFollowUsers(userId int, token string) (users []class.User) {
 	return users
 }
 
-func FindFollowerUsers(userId int, token string) (users []class.User) {
+func FindFollowerUsers(userId int64, token string) (users []class.User) {
 	_ = FindFollowUsers(userId, token)
 
 	if err := CheckUser(userId, token); err != nil {
@@ -92,7 +92,7 @@ func FindFollowerUsers(userId int, token string) (users []class.User) {
 		return nil
 	}
 
-	db.Select("`user`.`id`,`user`.`name`,`user`.`follow_count`,`user`.`follower_count`,`user`.`token`").
+	db.Select("`user`.*").
 		Joins("left join relation r on user.id = r.my_id").
 		Where("other_user_id = ?", userId).Find(&users)
 
@@ -109,7 +109,7 @@ func FindFollowerUsers(userId int, token string) (users []class.User) {
 }
 
 // FindFriends 只有我关注且关注我的才能看见
-func FindFriends(userId int, token string) (userFriends []class.FriendUser) {
+func FindFriends(userId int64, token string) (userFriends []class.FriendUser) {
 	var followUsers []class.User
 	//var followerUsers []class.User
 	// follows用于避免关注者和粉丝重复

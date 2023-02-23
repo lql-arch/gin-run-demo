@@ -80,3 +80,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	moul.io/http2curl/v2 v2.3.0 // indirect
 )
+
+replace github.com/apache/thrift => github.com/apache/thrift v0.13.0

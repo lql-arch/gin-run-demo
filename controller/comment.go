@@ -2,6 +2,7 @@ package controller
 
 import (
 	"douSheng/class"
+	"douSheng/setting"
 	"douSheng/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -12,12 +13,12 @@ import (
 
 type CommentListResponse struct {
 	class.Response
-	CommentList []class.Comment `json:"comment_list,omitempty"`
+	CommentList []class.JsonComment `json:"comment_list,omitempty"`
 }
 
 type CommentActionResponse struct {
 	class.Response
-	Comment class.Comment `json:"comment,omitempty"`
+	Comment class.JsonComment `json:"comment,omitempty"`
 }
 
 // CommentAction no practical effect, just check if token is valid
@@ -31,15 +32,15 @@ func CommentAction(c *gin.Context) {
 		text := c.Query("comment_text")
 		videoId, _ := strconv.Atoi(c.Query("video_id"))
 
-		times := time.Now().Unix()
-
 		comment := class.Comment{
-			Author:     user,
-			UserToken:  token,
-			Content:    text,
-			CreateDate: times,
-			VideoId:    videoId,
-			Type:       actionType,
+			GormComment: class.GormComment{
+				Author:    user,
+				UserToken: token,
+				Content:   text,
+				VideoId:   videoId,
+				Type:      actionType,
+			},
+			CreateDate: time.Now().Unix(),
 		}
 
 		if actionType == 1 { // 发布评论
@@ -54,7 +55,10 @@ func CommentAction(c *gin.Context) {
 
 			c.JSON(http.StatusOK, CommentActionResponse{
 				Response: class.Response{StatusCode: 0},
-				Comment:  comment,
+				Comment: class.JsonComment{
+					GormComment: comment.GormComment,
+					CreateDate:  setting.CommentTimeString(comment.CreateDate),
+				},
 			})
 
 			return

@@ -2,20 +2,29 @@ package sql
 
 import (
 	"douSheng/class"
+	"douSheng/setting"
 	"log"
 )
 
-func FindComments(videoId int, token string) []class.Comment {
+func FindComments(videoId int, token string) (comments []class.JsonComment) {
 	tx := getDB()
-	var comments []class.Comment
+	var tmpComments []class.Comment
 
 	users := make(map[int64]class.User)
 	myUser, _ := FindUser(token)
 
 	result := tx.Table("comment c").Preload("Author").
-		Select("c.user_token, c.id as c_id , c.content, c.create_date, c.video_id,u.name,u.follow_count,u.follower_count,u.token").
+		Select("c.user_token, c.id as c_id , c.content, c.create_date, c.video_id,u.*").
 		Joins("left join user u on c.user_token = u.token").
-		Where("c.video_id = ?", videoId).Order("create_date").Find(&comments)
+		Where("c.video_id = ?", videoId).Order("create_date").Find(&tmpComments)
+
+	for i := range tmpComments {
+		var comment = class.JsonComment{
+			GormComment: tmpComments[i].GormComment,
+			CreateDate:  setting.CommentTimeString(tmpComments[i].CreateDate),
+		}
+		comments = append(comments, comment)
+	}
 
 	for i := range comments {
 		if comments[i].Id == 0 {

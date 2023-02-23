@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"douSheng/Const"
 	"douSheng/class"
 	"douSheng/service"
 	"douSheng/sql"
@@ -42,9 +43,9 @@ func Register(c *gin.Context) {
 				Token:           token,
 				FollowCount:     0,
 				FollowerCount:   0,
-				BackgroundImage: "http://192.168.104.60:8080/jpg/bronya.jpg",
+				BackgroundImage: Const.ServiceUrl + "/jpg/bronya.jpg",
 				Signature:       "这个人啥都没有",
-				Avatar:          "http://192.168.104.60:8080/jpg/bronya.jpg",
+				Avatar:          Const.ServiceUrl + "/jpg/bronya.jpg",
 				TotalFavorite:   0,
 				WorkCount:       0,
 				FavoriteCount:   0,

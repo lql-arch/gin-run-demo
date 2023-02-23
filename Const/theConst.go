@@ -5,5 +5,5 @@ package Const
 //const Host = "127.0.0.1"  // mysql数据库地址，可以是Ip或者域名
 //const Addr = "3306"  // mysql端口
 //const Name = "douyin" // mysql数据库名字
-//const Url = "http://127.0.0.1:8080"
 //const TimeTemplate = "2006-01-02 15:04:05"
+//const ServiceUrl = "http://127.0.0.1:8080" // 服务器地址

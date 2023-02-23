@@ -2,6 +2,7 @@ package sql
 
 import (
 	"douSheng/class"
+	"fmt"
 	"gorm.io/gorm"
 	"log"
 )
@@ -34,15 +35,23 @@ func RelationAction(myToken string, toUserId int64, state int) error {
 		State:       state,
 	}
 
+	var result *gorm.DB
+
 	if IsRelationExist(relation) {
-		err = db.Where(&class.Relation{
+		result = db.Where(&class.Relation{
 			MyId:        user.Id,
 			OtherUserId: toUserId,
 		}).Updates(&class.Relation{
 			State: state,
-		}).Error
+		})
+		err = result.Error
 	} else {
-		err = db.Create(&relation).Error
+		result = db.Create(&relation)
+		err = result.Error
+	}
+
+	if result.RowsAffected != 0 {
+		return err
 	}
 
 	if state == 1 {
@@ -74,12 +83,14 @@ func FindFollowUsers(userId int64, token string) (users []class.User) {
 
 	db.Select("`user`.*").
 		Joins("left join relation r on user.id = r.other_user_id").
-		Where("my_id = ?", userId).Find(&users)
+		Where("my_id = ? and r.state = ?", userId, 1).Find(&users)
 
 	for i := range users {
 		follows[users[i].Id] = struct{}{}
 		users[i].IsFollow = true
 	}
+
+	fmt.Println(users)
 
 	return users
 }

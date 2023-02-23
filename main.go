@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	_ "net/http/pprof"
 )
 
 func main() {
@@ -11,8 +12,17 @@ func main() {
 
 	initRouter(r)
 
+	//go testPprof()
+
 	err := r.Run()
 	if err != nil {
 		panic("run failed.")
-	} // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	}
 }
+
+//func testPprof() {
+//	err := http.ListenAndServe(":8888", nil)
+//	if err != nil {
+//		return
+//	}
+//}

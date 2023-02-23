@@ -22,7 +22,7 @@ go.work
 
 public_cover/
 public_videos/
-example_con/
+test/example_con/
 test/
 Const/
 kitexService/

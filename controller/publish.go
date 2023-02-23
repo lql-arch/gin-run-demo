@@ -80,9 +80,9 @@ func Publish(c *gin.Context) {
 		})
 		return
 	}
-	CoverPath := Const.Url + "/jpg/" + tmpCover
+	CoverPath := Const.ServiceUrl + "/jpg/" + tmpCover
 
-	filePath := Const.Url + "/static/" + finalName
+	filePath := Const.ServiceUrl + "/static/" + finalName
 	// 检查文件是否存在,存在更新文件退出(应成替换,而非更新)
 	if flag := sql.FindVideoByFile(filePath, user); flag {
 		c.JSON(http.StatusOK, class.Response{

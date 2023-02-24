@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/apache/thrift v0.18.0
 	github.com/cloudwego/kitex v0.4.4
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imaging v1.6.2
 	github.com/gavv/httpexpect/v2 v2.12.0
 	github.com/gin-gonic/gin v1.8.2

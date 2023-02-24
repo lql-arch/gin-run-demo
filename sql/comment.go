@@ -14,8 +14,8 @@ func FindComments(videoId int, token string) (comments []class.JsonComment) {
 	myUser, _ := FindUser(token)
 
 	result := tx.Table("comment c").Preload("Author").
-		Select("c.user_token, c.id as c_id , c.content, c.create_date, c.video_id,u.*").
-		Joins("left join user u on c.user_token = u.token").
+		Select("c.user_id, c.id as c_id , c.content, c.create_date, c.video_id,u.*").
+		Joins("left join user u on c.user_id = u.id").
 		Where("c.video_id = ?", videoId).Order("create_date").Find(&tmpComments)
 
 	for i := range tmpComments {

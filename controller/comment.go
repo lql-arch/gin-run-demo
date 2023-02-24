@@ -34,11 +34,11 @@ func CommentAction(c *gin.Context) {
 
 		comment := class.Comment{
 			GormComment: class.GormComment{
-				Author:    user,
-				UserToken: token,
-				Content:   text,
-				VideoId:   videoId,
-				Type:      actionType,
+				Author:  user,
+				UserId:  user.Id,
+				Content: text,
+				VideoId: videoId,
+				Type:    actionType,
 			},
 			CreateDate: time.Now().Unix(),
 		}

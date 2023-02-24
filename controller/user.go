@@ -27,7 +27,8 @@ func Register(c *gin.Context) {
 	password := c.Query("password")
 
 	token := username + password
-	token = ReplaceToken(token)
+	token, _ = GenerateToken(ReplaceToken(username), ReplaceToken(password))
+	token = Substring(token, 80)
 
 	if _, exist := sql.FindUser(token); exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
@@ -65,7 +66,8 @@ func Login(c *gin.Context) {
 	password := c.Query("password")
 
 	token := username + password
-	token = ReplaceToken(token)
+	token, _ = GenerateToken(ReplaceToken(username), ReplaceToken(password))
+	token = Substring(token, 80)
 
 	if user, exist := sql.FindUser(token); exist {
 		c.JSON(http.StatusOK, UserLoginResponse{

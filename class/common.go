@@ -26,13 +26,13 @@ type Video struct {
 }
 
 type GormComment struct {
-	Id        int64  `json:"id,omitempty" gorm:"column:id"`
-	UserToken string `json:"user_token"`                                         //sql
-	Author    User   `json:"user" gorm:"foreignKey:token;references:user_token"` // 评论用户信息
-	Content   string `json:"content,omitempty"`                                  // 评论内容
-	VideoId   int64  `json:"video_id"`                                           // 视频评论id
-	Type      int    `json:"type"`                                               // 2删除或1创建
-	CId       int64  `gorm:"<-:false" json:"c_id"`                               //只读,禁止写
+	Id      int64  `json:"id,omitempty" gorm:"column:id"`
+	UserId  int64  `json:"user_id"`                                      //sql
+	Author  User   `json:"user" gorm:"foreignKey:id;references:user_id"` // 评论用户信息
+	Content string `json:"content,omitempty"`                            // 评论内容
+	VideoId int64  `json:"video_id"`                                     // 视频评论id
+	Type    int    `json:"type"`                                         // 2删除或1创建
+	CId     int64  `gorm:"<-:false" json:"c_id"`                         //只读,禁止写
 }
 
 type JsonComment struct {
@@ -57,7 +57,7 @@ type User struct {
 	Avatar          string `json:"avatar"`                                        //用户头像
 	TotalFavorite   int64  `json:"total_favorited" gorm:"column:total_favorited"` //获赞数量
 	WorkCount       int64  `json:"work_count"`                                    //作品数量
-	FavoriteCount   int64  `json:"favorite_count"`                                //点赞数量
+	FavoriteCount   int64  `json:"favorite_count" gorm:"column:favorited_count"`  //点赞数量
 	Uid             int64  `gorm:"<-:false" json:"uid"`                           //只读,禁止写
 }
 

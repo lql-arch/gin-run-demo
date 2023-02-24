@@ -7,6 +7,7 @@
 
 使用gin开发,使用了gorm,ffmpeg,kitex(待定)等外部库,需要先进行go mod管理,再编译运行
 
+
 ```shell
 go build && ./douSheng
 ```
@@ -15,6 +16,7 @@ go build && ./douSheng
 
 - 使用gorm预编译防止sql注入
 - 使用ffmpeg "github.com/u2takey/ffmpeg-go",进行视频判断并且截图作为视频封面
+- 使用jwt-go用账户和密码生成token.
 
 ### 功能说明
 

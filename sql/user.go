@@ -80,9 +80,9 @@ func GetUserIdByVideoId(id int64) class.User {
 func InsertUserPublicCount(id int64, flag bool) {
 
 	if flag { // 增加
-		db.Model(&class.User{}).Where("id = ?", id).Update("total_favorited", gorm.Expr("total_favorited + 1"))
+		db.Model(&class.User{}).Where("id = ?", id).Update("work_count", gorm.Expr("work_count + 1"))
 	} else { // 删除
-		db.Model(&class.User{}).Where("id = ?", id).Update("total_favorited", gorm.Expr("total_favorited - 1"))
+		db.Model(&class.User{}).Where("id = ?", id).Update("work_count", gorm.Expr("work_count - 1"))
 	}
 
 }

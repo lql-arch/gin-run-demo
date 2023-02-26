@@ -14,8 +14,8 @@
 
 - kitex使用不正常可以查询[MyKitex](https://juejin.cn/post/7191552210696667196)的第一部分,它提供了kitex异常爆红的一些可能.  
 
-> 使用go版本为19.5(不要使用大于等于1.20的版本)   
-> 开发环境为linux/amd64
+> 使用go版本为19.5(不要使用大于等于1.20的版本)     
+> 开发环境为linux/amd64   
 > 使用数据库为 mysql Ver 15.1 Distrib 10.10.3-MariaDB, for Linux (x86_64) using readline 5.1
 
 ```shell

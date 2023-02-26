@@ -2,15 +2,21 @@
 
 ## 抖声项目服务端
 
-使用前先添加数据库sqlStatement/create.sql  
-在Const/theConst中修改参数  
+- 项目使用go语言开发,实现了抖声app的后端服务器
 
-使用gin开发,使用了gorm,ffmpeg,kitex(待定)等外部库,需要先进行go mod管理,再编译运行  
-所有所需库已经补充在go.mod中
-kitex使用不正常可以查询[MyKitex](https://juejin.cn/post/7191552210696667196)的第一部分,它提供了kitex异常爆红的一些可能.  
+- 使用前先添加数据库sqlStatement/create.sql
+
+- 在Const/theConst中修改参数  
+
+- 使用gin开发,使用了gorm,ffmpeg,kitex(待定)等外部库,需要先进行go mod管理,再编译运行  
+
+- 所有所需库已经补充在go.mod中
+
+- kitex使用不正常可以查询[MyKitex](https://juejin.cn/post/7191552210696667196)的第一部分,它提供了kitex异常爆红的一些可能.  
 
 > 使用go版本为19.5(不要使用大于等于1.20的版本)   
 > 开发环境为linux/amd64
+> 使用数据库为 mysql Ver 15.1 Distrib 10.10.3-MariaDB, for Linux (x86_64) using readline 5.1
 
 ```shell
 go build && ./douSheng
@@ -84,3 +90,11 @@ go build && ./douSheng
 
 - /douyin/message/action/ - 消息操作
   - 登录用户对消息的相关操作，目前只支持消息发送
+
+### 项目进度
+> 当前 : 单体架构
+> 预期 : 微服务
+> 当前目标 : 添加kitex使用gRPC连接业务逻辑层与持久化层(数据库) -> 添加redis缓存层
+
+### [函数接口文档](funcJoggle.md)
+

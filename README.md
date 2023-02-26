@@ -96,5 +96,7 @@ go build && ./douSheng
 > 预期 : 微服务
 > 当前目标 : 添加kitex使用gRPC连接业务逻辑层与持久化层(数据库) -> 添加redis缓存层
 
-### [函数接口文档](funcJoggle.md)
+### [函数接口文档](funcJoggle.md)(未完成)
 
+
+### [项目接口说明](接口文档记录.md)

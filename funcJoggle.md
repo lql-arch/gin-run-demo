@@ -12,6 +12,21 @@
 - UserInfo(c *gin.Context)
   - 查询用户信息
 
+- FavoriteList(c *gin.Context)
+  - 如果token验证通过,就返回我所有喜爱的视频列表
+
+- FavoriteAction(c *gin.Context)
+  - 如果token验证通过,就将视频添加到我喜欢列表
+
+- Publish(c *gin.Context)
+  - 如果token验证通过,判断是否是视频,保存封面,将视频提交到服务器,视频文件信息提交到服务器数据库
+
+- GetSnapshot(videoPath, snapshotPath string, frameNum int)
+  - 根据视频截取视频封面
+
+- PublishList(c *gin.Context)
+  - 如果token验证通过,就返回我所有发布的视频列表
+
 - 
 
 ## 缓存层(redis)

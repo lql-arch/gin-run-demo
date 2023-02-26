@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func FavoriteAction(c *gin.Context) {
@@ -29,16 +28,7 @@ func FavoriteAction(c *gin.Context) {
 
 func FavoriteList(c *gin.Context) {
 	token := c.Query("token")
-	if token == "" {
-		list, nextTime := sql.ReadVideos(time.Now().Unix(), token)
-		c.JSON(http.StatusOK, VideoListResponse{
-			Response: class.Response{
-				StatusCode: 0,
-			},
-			VideoList: list,
-			NextTime:  nextTime,
-		})
-	} else {
+	if token != "" {
 		c.JSON(http.StatusOK, VideoListResponse{
 			Response: class.Response{
 				StatusCode: 0,

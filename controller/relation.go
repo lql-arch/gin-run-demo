@@ -43,6 +43,18 @@ func FollowList(c *gin.Context) {
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
 	token := c.Query("token")
 
+	if _, ok := sql.FindUser(token); !ok {
+		log.Println("token do not exist.")
+
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: class.Response{
+				StatusCode: 1,
+				StatusMsg:  "token do not exist.",
+			},
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, UserListResponse{
 		Response: class.Response{
 			StatusCode: 0,
@@ -54,6 +66,18 @@ func FollowList(c *gin.Context) {
 func FollowerList(c *gin.Context) {
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
 	token := c.Query("token")
+
+	if _, ok := sql.FindUser(token); !ok {
+		log.Println("token do not exist.")
+
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: class.Response{
+				StatusCode: 1,
+				StatusMsg:  "token do not exist.",
+			},
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, UserListResponse{
 		Response: class.Response{

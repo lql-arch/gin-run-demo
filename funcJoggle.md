@@ -27,11 +27,24 @@
 - PublishList(c *gin.Context)
   - 如果token验证通过,就返回我所有发布的视频列表
 
-- 
+- RelationAction(c *gin.Context)
+  - 如果token验证通过,就将to_user_id用户加入自己的关注列表
+
+- FollowList(c *gin.Context)
+  - 如果token验证通过,就返回我的关注列表
+
+- FollowerList(c *gin.Context)
+  - 如果token验证通过,
+
+
+
+<hr>
 
 ## 缓存层(redis)
 
 - 
+
+<hr>
 
 ## 持久化层(mysql)
 

@@ -1,6 +1,5 @@
 namespace go api
 
-
 struct Response {
     1: i32    status
 	2: string message
@@ -20,15 +19,6 @@ struct Video {
     10: i64	            CreateAt
     11: i64	            UpdateAt
 }
-
-//struct User {
-//    1: i64  Id
-//    2: string Name
-//    3: i64 FollowCount
-//    4: i64 FollowerCount
-//    5: bool IsFollow
-//    6: string token
-//}
 
 struct FriendUser {
     1: User     user
@@ -83,12 +73,15 @@ struct Message {
 }
 
 service Echo {
-    Response Video(1: Video req)
-    Response User(1: User req)
-    Response FriendUser(1: FriendUser req)
-    Response Comment(1: Comment req)
-    Response UserVideoFavorite(1: UserVideoFavorite req)
-    Response Relation(1: Relation req)
-    Relation Message(1: Message req)
+//    Response Video(1: Video req)
+//    Response User(1: User req)
+//    Response FriendUser(1: FriendUser req)
+//    Response Comment(1: Comment req)
+//    Response UserVideoFavorite(1: UserVideoFavorite req)
+//    Response Relation(1: Relation req)
+//    Response Message(1: Message req)
+    Comment FindComments(1: i32 videoId ,2: string token)
+    Response ReviseComment(1: Comment comment )
+    Response
 }
 

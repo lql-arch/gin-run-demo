@@ -6,7 +6,8 @@ import (
 )
 
 // EchoImpl implements the last service interface defined in the IDL.
-type EchoImpl struct{}
+type EchoImpl struct {
+}
 
 // Video implements the EchoImpl interface.
 func (s *EchoImpl) Video(ctx context.Context, req *api.Video) (resp *api.Response, err error) {

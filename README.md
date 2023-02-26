@@ -5,7 +5,9 @@
 使用前先添加数据库sqlStatement/create.sql  
 在Const/theConst中修改参数  
 
-使用gin开发,使用了gorm,ffmpeg,kitex(待定)等外部库,需要先进行go mod管理,再编译运行
+使用gin开发,使用了gorm,ffmpeg,kitex(待定)等外部库,需要先进行go mod管理,再编译运行  
+所有所需库已经补充在go.mod中
+kitex使用不正常可以查询[MyKitex](https://juejin.cn/post/7191552210696667196)的第一部分,它提供了kitex异常爆红的一些可能.  
 
 > 使用go版本为19.5(不要使用大于等于1.20的版本)   
 > 开发环境为linux/amd64
@@ -20,7 +22,7 @@ go build && ./douSheng
 - 使用ffmpeg "github.com/u2takey/ffmpeg-go",进行视频判断并且截图作为视频封面
 - 使用jwt-go用账户和密码生成token.
 
-### 项目功能说明
+### 项目分层功能说明
 - Class : 项目使用的数据结构
 - Const : 项目启动前,需要配置的一些参数
 - Controller : 项目的业务逻辑层

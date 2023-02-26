@@ -1,7 +1,16 @@
-## 持久化层
+## 业务逻辑层
 
 - Feed(c *gin.Context)
   - 查询最近时间至多30个视频信息返回
+
+- Register(c *gin.Context)
+  - 注册用户
+
+- Login(c *gin.Context)
+  - 登录用户,检查用户是否存在
+
+- UserInfo(c *gin.Context)
+  - 查询用户信息
 
 - 
 

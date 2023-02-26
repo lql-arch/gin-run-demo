@@ -109,6 +109,7 @@ func UserInfo(c *gin.Context) {
 
 }
 
+// ReplaceToken 对token进行简单的替换
 func ReplaceToken(token string) string {
 	var str strings.Builder
 

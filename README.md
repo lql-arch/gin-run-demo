@@ -20,10 +20,6 @@
 > 开发环境为linux/amd64   
 > 使用数据库为 mysql Ver 15.1 Distrib 10.10.3-MariaDB, for Linux (x86_64) using readline 5.1
 
-```shell
-go build && ./douSheng
-```
-
 ### 一些注意
 
 - 使用gorm预编译防止sql注入
@@ -54,7 +50,7 @@ yeyr2 : 全部(悲)
 
 ### [项目接口记录](接口文档记录.md)
 
-### 接口功能说明
+#### 接口功能简易说明
 
 - /douyin/feed/ - 视频流接口
   - 随机抽取视频,以传入的时间为最迟(传入的时间一般为now())

@@ -84,11 +84,12 @@
 
 ## 缓存层(redis)
 > 预计信息先存到redis里,等待一定时间或者数量再发送到数据库
-- 
+
 
 <hr>
 
 ## 持久化层(mysql)
+> 修改框架中,待完成后再继续添加
 
 - ReadVideos(latestTime int64, token string) ([]class.Video, int64)
   - 查询数据库中的最迟为lastestTime的30个视频信息,如果token不为空,则查询自身与视频及其视频作者的关系,

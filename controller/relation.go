@@ -23,35 +23,32 @@ func RelationAction(c *gin.Context) {
 	token := c.Query("token")
 	toUserId, _ := strconv.ParseInt(c.Query("to_user_id"), 0, 64)
 	state, _ := strconv.Atoi(c.Query("action_type"))
-	if user, exist := sql.FindUser(token); exist {
-		if user.Id == toUserId && state == 1 {
-			c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "不能关注自己"})
-			return
-		}
-		if err := sql.RelationAction(token, toUserId, state); err != nil {
-			log.Println(err)
-			c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "关注错误"})
-			return
-		}
-		c.JSON(http.StatusOK, class.Response{StatusCode: 0})
+
+	user, ok := FindUserToken(token, c)
+	// 用户是否存在
+	if !ok { // 用户不存在
 		return
 	}
-	c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+
+	if user.Id == toUserId && state == 1 {
+		c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "不能关注自己"})
+		return
+	}
+
+	if err := sql.RelationAction(token, toUserId, state); err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "关注错误"})
+		return
+	}
+
+	c.JSON(http.StatusOK, class.Response{StatusCode: 0})
 }
 
 func FollowList(c *gin.Context) {
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
 	token := c.Query("token")
 
-	if _, ok := sql.FindUser(token); !ok {
-		log.Println("token do not exist.")
-
-		c.JSON(http.StatusOK, UserListResponse{
-			Response: class.Response{
-				StatusCode: 1,
-				StatusMsg:  "token do not exist.",
-			},
-		})
+	if _, ok := FindUserToken(token, c); !ok {
 		return
 	}
 
@@ -67,15 +64,7 @@ func FollowerList(c *gin.Context) {
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
 	token := c.Query("token")
 
-	if _, ok := sql.FindUser(token); !ok {
-		log.Println("token do not exist.")
-
-		c.JSON(http.StatusOK, UserListResponse{
-			Response: class.Response{
-				StatusCode: 1,
-				StatusMsg:  "token do not exist.",
-			},
-		})
+	if _, ok := FindUserToken(token, c); !ok {
 		return
 	}
 
@@ -91,6 +80,10 @@ func FollowerList(c *gin.Context) {
 func FriendList(c *gin.Context) {
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
 	token := c.Query("token")
+
+	if _, ok := FindUserToken(token, c); !ok {
+		return
+	}
 
 	c.JSON(http.StatusOK, UserFriendListResponse{
 		Response: class.Response{

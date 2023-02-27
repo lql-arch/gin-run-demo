@@ -24,7 +24,7 @@ public_cover/
 public_videos/
 test/example_con/
 test/
-Const/
+Const/const.go
 kitexService/
 service/message.go
 

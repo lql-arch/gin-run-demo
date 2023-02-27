@@ -1,10 +1,20 @@
 package controller
 
 import (
+	"douSheng/class"
+	"douSheng/sql"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
 	"strings"
 	"time"
 )
+
+type toUserUser struct {
+	class.User
+	times time.Time
+}
 
 // Claims Claim是一些实体（通常指的用户）的状态和额外的元数据
 type Claims struct {
@@ -13,7 +23,12 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-var jwtSecret = []byte("setting.JwtSecret")
+var tokenList = make(map[string]toUserUser)
+var jwtSecret = []byte("controller.Token")
+
+func init() {
+	go DeleteTokenList()
+}
 
 // GenerateToken 根据用户的用户名和密码产生token
 func GenerateToken(username, password string) (string, error) {
@@ -56,6 +71,7 @@ func ParseToken(token string) (*Claims, error) {
 	return nil, err
 }
 
+// Substring 截取token的长度
 func Substring(token string, size int) string {
 	var str strings.Builder
 
@@ -67,4 +83,42 @@ func Substring(token string, size int) string {
 	}
 
 	return str.String()
+}
+
+// FindUserToken 查询用户的token,先在tokenList中查询,如果不存在,就在数据库中查询
+func FindUserToken(token string, c *gin.Context) (class.User, bool) {
+	user, ok := tokenList[token]
+
+	if ok {
+		return user.User, true
+	}
+
+	user.User, ok = sql.FindUser(token)
+	if !ok {
+		log.Println("token does not exist.")
+
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: class.Response{
+				StatusCode: 1,
+				StatusMsg:  "token does not exist.",
+			},
+		})
+		return user.User, false
+	}
+
+	user.times = time.Now().Add(7 * 24 * time.Hour)
+	tokenList[token] = user
+
+	return user.User, true
+}
+
+// DeleteTokenList 删除存在时间大于一周的token记录
+func DeleteTokenList() {
+	for k, v := range tokenList {
+		if v.times.Before(time.Now()) {
+			delete(tokenList, k)
+		}
+	}
+
+	time.AfterFunc(3*24*time.Hour, DeleteTokenList)
 }

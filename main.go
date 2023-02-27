@@ -11,7 +11,6 @@ func main() {
 	r := gin.Default()
 
 	initRouter(r)
-
 	//go testPprof()
 
 	err := r.Run()

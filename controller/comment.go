@@ -80,10 +80,13 @@ func CommentAction(c *gin.Context) {
 	c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "未知错误"})
 }
 
-// CommentList all videos have same demo comment list
 func CommentList(c *gin.Context) {
 	videoId, _ := strconv.Atoi(c.Query("video_id"))
 	token := c.Query("token")
+
+	if _, ok := FindUserToken(token, c); ok {
+		return
+	}
 
 	c.JSON(http.StatusOK, CommentListResponse{
 		Response:    class.Response{StatusCode: 0},

@@ -33,7 +33,7 @@ func FavoriteAction(token string, videoID int64, actionType int) (err error) {
 
 		// 个人点赞
 		tmp, _ := FindUser(token)
-		db.Model(&class.User{}).Where("id = ?", tmp.Id).Update("favorite_count", gorm.Expr("favorite_count + 1"))
+		db.Model(&class.User{}).Where("id = ?", tmp.Id).Update("favorited_count", gorm.Expr("favorited_count + 1"))
 		tmp = GetUserIdByVideoId(videoID)
 		db.Model(&class.User{}).Where("id = ?", tmp.Id).Update("total_favorited", gorm.Expr("total_favorited + 1"))
 	} else if actionType == 2 {
@@ -46,7 +46,7 @@ func FavoriteAction(token string, videoID int64, actionType int) (err error) {
 
 		// 个人点赞
 		tmp, _ := FindUser(token)
-		db.Model(&class.User{}).Where("id = ?", tmp.Id).Update("favorite_count", gorm.Expr("favorite_count - 1"))
+		db.Model(&class.User{}).Where("id = ?", tmp.Id).Update("favorited_count", gorm.Expr("favorited_count - 1"))
 		tmp = GetUserIdByVideoId(videoID)
 		db.Model(&class.User{}).Where("id = ?", tmp.Id).Update("total_favorited", gorm.Expr("total_favorited - 1"))
 

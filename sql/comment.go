@@ -3,6 +3,7 @@ package sql
 import (
 	"douSheng/class"
 	"douSheng/setting"
+	"gorm.io/gorm"
 	"log"
 )
 
@@ -47,8 +48,6 @@ func FindComments(videoId int64, token string) (comments []class.JsonComment) {
 		}
 	}
 
-	//fmt.Println(comments)
-
 	if result.Error != nil {
 		log.Println(result.Error)
 	}
@@ -57,14 +56,25 @@ func FindComments(videoId int64, token string) (comments []class.JsonComment) {
 
 // ReviseComment 根据actionType状态添加或者删除comment到数据库
 func ReviseComment(comment class.Comment) (int64, error) {
-	tx := getDB()
-	var err error
+	var result *gorm.DB
 
 	if comment.Type == 1 { // 添加
-		err = tx.Create(&comment).Error
+		result = db.Create(&comment)
+
+		if result.RowsAffected == 0 {
+			return comment.Id, result.Error
+		}
+
+		result = db.Model(&class.Video{}).Where("id = ?", comment.VideoId).Update("comment_count", gorm.Expr("comment_count + 1"))
 	} else { // 删除
-		err = tx.Where("id = ?", comment.Id).Delete(&class.Comment{}).Error
+		result = db.Where("id = ?", comment.Id).Delete(&class.Comment{})
+
+		if result.RowsAffected == 0 {
+			return comment.Id, result.Error
+		}
+
+		result = db.Model(&class.Video{}).Where("id = ?", comment.VideoId).Update("comment_count", gorm.Expr("comment_count - 1"))
 	}
 
-	return comment.Id, err
+	return comment.Id, result.Error
 }

@@ -4,7 +4,6 @@ import (
 	"douSheng/class"
 	"douSheng/setting"
 	"douSheng/sql"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -67,13 +66,12 @@ func CommentAction(c *gin.Context) {
 			return
 		} else if actionType == 2 { // 删除评论
 			comment.Id, _ = strconv.ParseInt(c.Query("comment_id"), 0, 64)
-			fmt.Println(comment.Id)
+
 			// 删除comment到数据库
 			if _, err := sql.ReviseComment(comment); err != nil {
 				c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "删除失败"})
 				return
 			}
-
 			c.JSON(http.StatusOK, class.Response{StatusCode: 0, StatusMsg: "删除成功"})
 			return
 		}

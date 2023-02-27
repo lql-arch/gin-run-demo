@@ -81,7 +81,7 @@ func Login(c *gin.Context) {
 		})
 	}
 	go service.LoginReset()
-	go LoginReset()
+	//go LoginReset()
 }
 
 func UserInfo(c *gin.Context) {

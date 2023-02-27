@@ -1,7 +1,6 @@
 package controller
 
+// LoginReset 用以解决用户登录后重置部分信息(前端解决)
 func LoginReset() {
-	if !ChatEmpty() { // 进行判断是否重置tempChat
-		ChatReset()
-	}
+
 }

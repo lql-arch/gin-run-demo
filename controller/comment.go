@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -30,10 +31,6 @@ func CommentAction(c *gin.Context) {
 		text := c.Query("comment_text")
 		videoId, _ := strconv.ParseInt(c.Query("video_id"), 0, 64)
 
-		if text == "" {
-			c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "这是一条空信息."})
-		}
-
 		comment := class.Comment{
 			GormComment: class.GormComment{
 				Author:  user,
@@ -46,6 +43,14 @@ func CommentAction(c *gin.Context) {
 		}
 
 		if actionType == 1 { // 发布评论
+			if strings.TrimSpace(text) == "" { //只有空格的或者空字符串不能发送
+				c.JSON(http.StatusOK, class.Response{
+					StatusCode: 1,
+					StatusMsg:  "这是一条空信息.",
+				})
+				return
+			}
+
 			// 添加comment到数据库
 			id, err := sql.ReviseComment(comment)
 			if err != nil {
@@ -72,7 +77,7 @@ func CommentAction(c *gin.Context) {
 				c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "删除失败"})
 				return
 			}
-			c.JSON(http.StatusOK, class.Response{StatusCode: 0, StatusMsg: "删除成功"})
+			c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "删除成功"})
 			return
 		}
 	} else {

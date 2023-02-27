@@ -63,9 +63,6 @@
     - 对token进行验证,如果不通过就返回错误
     - 读取该用户与toUserId对应用户最新的聊天记录
 
-  - timeToken(myId int64, ToUserId string) 
-    - 构建myId与ToUserId形成timeToken,键值对存储最后一次读的时间,以读取最新消息
-
 - token
   - GenerateToken(username, password string) (string, error)
     - GenerateToken 根据用户的用户名和密码产生token

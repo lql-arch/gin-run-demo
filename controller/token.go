@@ -4,9 +4,7 @@ import (
 	"douSheng/class"
 	"douSheng/sql"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 	"log"
-	"net/http"
 	"strings"
 	"time"
 )
@@ -71,7 +69,7 @@ func ParseToken(token string) (*Claims, error) {
 	return nil, err
 }
 
-// Substring 截取token的长度
+// Substring 从开头截取token的长为size内容
 func Substring(token string, size int) string {
 	var str strings.Builder
 
@@ -85,8 +83,9 @@ func Substring(token string, size int) string {
 	return str.String()
 }
 
-// FindUserToken 查询用户的token,先在tokenList中查询,如果不存在,就在数据库中查询
-func FindUserToken(token string, c *gin.Context) (class.User, bool) {
+// FindUserToken 查询用户的token,先在tokenList中查询,如果不存在,就在数据库中查询.
+// 缺少实时性,如果使用user,则尽可能使用不能被修改的数据
+func FindUserToken(token string) (class.User, bool) {
 	user, ok := tokenList[token]
 
 	if ok {
@@ -97,12 +96,6 @@ func FindUserToken(token string, c *gin.Context) (class.User, bool) {
 	if !ok {
 		log.Println("token does not exist.")
 
-		c.JSON(http.StatusOK, UserListResponse{
-			Response: class.Response{
-				StatusCode: 1,
-				StatusMsg:  "token does not exist.",
-			},
-		})
 		return user.User, false
 	}
 

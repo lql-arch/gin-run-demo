@@ -4,7 +4,7 @@ import (
 	"douSheng/class"
 )
 
-func MessageChat(fromUserId int, toUserId int, recentTime int64) ([]class.Message, int64) {
+func MessageChat(fromUserId int64, toUserId int64, recentTime int64) ([]class.Message, int64) {
 	var messages []class.Message
 	db.
 		Where("((my_id = ? and to_user_id = ?) or (my_id = ? and to_user_id = ?)) and create_at > ?",

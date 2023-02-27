@@ -82,15 +82,16 @@ func MessageAction(c *gin.Context) {
 func MessageChat(c *gin.Context) { // 只返回最新的数据,
 	token := c.Query("token")
 
-	if user, exist := sql.FindUser(token); exist {
+	// user 不需要使用会改变的信息
+	if user, exist := FindUserToken(token); exist {
 		var messages []class.Message
 		userId := c.Query("to_user_id")
 
-		toUserId, _ := strconv.Atoi(userId)
+		toUserId, _ := strconv.ParseInt(userId, 0, 64)
 		id := timeToken(user.Id, userId)
 		recentTime := tempChat[id] // 防止自己发送消息多次显示
 
-		messages, recentTime = sql.MessageChat(int(user.Id), toUserId, recentTime)
+		messages, recentTime = sql.MessageChat(user.Id, toUserId, recentTime)
 		// 历史信息(已取消使用)
 		//ChatMessage[id] = append(ChatMessage[id], messages...)
 		tempChat[id] = recentTime
@@ -106,6 +107,7 @@ func MessageChat(c *gin.Context) { // 只返回最新的数据,
 	}
 }
 
+// 构建myId与ToUserId形成timeToken,键值对存储最后一次读的时间,以读取最新消息
 func timeToken(myId int64, ToUserId string) string {
 	id := strconv.FormatInt(myId, 10)
 	return fmt.Sprintf("%s_%s", id, ToUserId)

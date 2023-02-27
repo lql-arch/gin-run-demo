@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
 	_ "net/http/pprof"
 )
 
@@ -19,9 +20,9 @@ func main() {
 	}
 }
 
-//func testPprof() {
-//	err := http.ListenAndServe(":8888", nil)
-//	if err != nil {
-//		return
-//	}
-//}
+func testPprof() {
+	err := http.ListenAndServe(":8888", nil)
+	if err != nil {
+		return
+	}
+}

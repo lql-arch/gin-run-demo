@@ -46,16 +46,44 @@
 
 - comment
   - CommentAction(c *gin.Context)
-    - 如果token验证通过,
+    - 先进行token验证,不通过直接返回错误
+    - 根据action_type判断是发布还是删除
+    - 如果是发布,判断comment_text是空字符串,则直接返回错误,非空则将数据添加,
+    - 删除就根据comment_id将comment删除
 
   - CommentList(c *gin.Context)
-    - 如果
+    - 如果token和videoId验证通过,返回根据videoId获取的评论信息
 
+- message
+  - MessageAction(c *gin.Context)
+    - 如果content是空字符串,则直接返回错误.
+    - 如果content是非空字符串且token验证通过,就添加信息到数据库
+
+  - MessageChat(c *gin.Context)
+    - 对token进行验证,如果不通过就返回错误
+    - 读取该用户与toUserId对应用户最新的聊天记录
+
+  - timeToken(myId int64, ToUserId string) 
+    - 构建myId与ToUserId形成timeToken,键值对存储最后一次读的时间,以读取最新消息
+
+- token
+  - GenerateToken(username, password string) (string, error)
+    - GenerateToken 根据用户的用户名和密码产生token
+
+  - ParseToken(token string) (*Claims, error)
+    - ParseToken 根据传入的token值获取到Claims对象信息，（进而获取其中的用户名和密码）
+
+  - Substring(token string, size int)
+    - 从开头截取token的长为size内容
+
+  - FindUserToken(token string) (class.User, bool)
+    - FindUserToken 查询用户的token,先在tokenList中查询,如果不存在,就在数据库中查询.
+    - 缺少实时性,如果使用user,则尽可能使用不能被修改的数据
 
 <hr>
 
 ## 缓存层(redis)
-
+> 预计信息先存到redis里,等待一定时间或者数量再发送到数据库
 - 
 
 <hr>

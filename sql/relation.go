@@ -49,7 +49,7 @@ func RelationAction(myToken string, toUserId int64, state int) error {
 		err = result.Error
 	}
 
-	if result.RowsAffected != 0 {
+	if result.RowsAffected == 0 {
 		return err
 	}
 

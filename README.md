@@ -10,6 +10,8 @@
 
 - 使用gin开发,使用了gorm,ffmpeg,kitex(待定)等外部库,需要先进行go mod管理,再编译运行  
 
+- 预计待redis补全,将信息先存到redis里,等待一定时间或者数量再发送到数据库
+
 - 所有所需库已经补充在go.mod中
 
 - kitex使用不正常可以查询[MyKitex](https://juejin.cn/post/7191552210696667196)的第一部分,它提供了kitex异常爆红的一些可能.  

@@ -24,9 +24,15 @@ func RelationAction(c *gin.Context) {
 	toUserId, _ := strconv.ParseInt(c.Query("to_user_id"), 0, 64)
 	state, _ := strconv.Atoi(c.Query("action_type"))
 
-	user, ok := FindUserToken(token, c)
+	user, ok := FindUserToken(token)
 	// 用户是否存在
 	if !ok { // 用户不存在
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: class.Response{
+				StatusCode: 0,
+				StatusMsg:  "token does not exist.",
+			},
+		})
 		return
 	}
 
@@ -48,7 +54,13 @@ func FollowList(c *gin.Context) {
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
 	token := c.Query("token")
 
-	if _, ok := FindUserToken(token, c); !ok {
+	if _, ok := FindUserToken(token); !ok {
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: class.Response{
+				StatusCode: 0,
+				StatusMsg:  "token does not exist.",
+			},
+		})
 		return
 	}
 
@@ -64,7 +76,13 @@ func FollowerList(c *gin.Context) {
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
 	token := c.Query("token")
 
-	if _, ok := FindUserToken(token, c); !ok {
+	if _, ok := FindUserToken(token); !ok {
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: class.Response{
+				StatusCode: 0,
+				StatusMsg:  "token does not exist.",
+			},
+		})
 		return
 	}
 
@@ -81,7 +99,13 @@ func FriendList(c *gin.Context) {
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 0, 64)
 	token := c.Query("token")
 
-	if _, ok := FindUserToken(token, c); !ok {
+	if _, ok := FindUserToken(token); !ok {
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: class.Response{
+				StatusCode: 0,
+				StatusMsg:  "token does not exist.",
+			},
+		})
 		return
 	}
 

@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func FindComments(videoId int, token string) (comments []class.JsonComment) {
+func FindComments(videoId int64, token string) (comments []class.JsonComment) {
 	var tmpComments []class.Comment
 
 	users := make(map[int64]class.User)

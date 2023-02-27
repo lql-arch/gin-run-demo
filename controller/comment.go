@@ -31,6 +31,10 @@ func CommentAction(c *gin.Context) {
 		text := c.Query("comment_text")
 		videoId, _ := strconv.ParseInt(c.Query("video_id"), 0, 64)
 
+		if text == "" {
+			c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "这是一条空信息."})
+		}
+
 		comment := class.Comment{
 			GormComment: class.GormComment{
 				Author:  user,
@@ -70,7 +74,7 @@ func CommentAction(c *gin.Context) {
 				return
 			}
 
-			c.JSON(http.StatusOK, class.Response{StatusCode: 0})
+			c.JSON(http.StatusOK, class.Response{StatusCode: 0, StatusMsg: "删除成功"})
 			return
 		}
 	} else {
@@ -81,15 +85,31 @@ func CommentAction(c *gin.Context) {
 }
 
 func CommentList(c *gin.Context) {
-	videoId, _ := strconv.Atoi(c.Query("video_id"))
+	videoId, _ := strconv.ParseInt(c.Query("video_id"), 0, 64)
 	token := c.Query("token")
 
-	if _, ok := FindUserToken(token, c); ok {
+	list, ok := GetCommentList(videoId, token)
+
+	if !ok {
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: class.Response{
+				StatusCode: 1,
+				StatusMsg:  "token does not exist.",
+			},
+		})
 		return
 	}
 
 	c.JSON(http.StatusOK, CommentListResponse{
 		Response:    class.Response{StatusCode: 0},
-		CommentList: sql.FindComments(videoId, token),
+		CommentList: list,
 	})
+}
+
+func GetCommentList(videoId int64, token string) (list []class.JsonComment, ok bool) {
+	if _, ok = FindUserToken(token); !ok {
+		return nil, false
+	}
+
+	return sql.FindComments(videoId, token), true
 }

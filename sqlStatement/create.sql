@@ -7,7 +7,7 @@ create table comment
     user_token  varchar(70)  not null,
     id          int auto_increment
         primary key,
-    content     varchar(100) not null,
+    content     varchar(200) not null,
     create_date bigint       not null,
     video_id    int          not null,
     type        int          not null

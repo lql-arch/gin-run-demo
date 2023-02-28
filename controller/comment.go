@@ -13,12 +13,12 @@ import (
 
 type CommentListResponse struct {
 	class.Response
-	CommentList []class.JsonComment `json:"comment_list,omitempty"`
+	CommentList []class.Comment `json:"comment_list,omitempty"`
 }
 
 type CommentActionResponse struct {
 	class.Response
-	Comment class.JsonComment `json:"comment,omitempty"`
+	Comment class.Comment `json:"comment,omitempty"`
 }
 
 func CommentAction(c *gin.Context) {
@@ -32,13 +32,11 @@ func CommentAction(c *gin.Context) {
 		videoId, _ := strconv.ParseInt(c.Query("video_id"), 0, 64)
 
 		comment := class.Comment{
-			GormComment: class.GormComment{
-				Author:  user,
-				UserId:  user.Id,
-				Content: text,
-				VideoId: videoId,
-				Type:    actionType,
-			},
+			Author:     user,
+			UserId:     user.Id,
+			Content:    text,
+			VideoId:    videoId,
+			Type:       actionType,
 			CreateDate: time.Now().Unix(),
 		}
 
@@ -53,19 +51,18 @@ func CommentAction(c *gin.Context) {
 
 			// 添加comment到数据库
 			id, err := sql.ReviseComment(comment)
+
 			if err != nil {
 				c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "发布失败" + err.Error()})
 				return
 			}
 
 			comment.Id = id
+			comment.JSONCreateDate = setting.CommentTimeString(comment.CreateDate)
 
 			c.JSON(http.StatusOK, CommentActionResponse{
 				Response: class.Response{StatusCode: 0},
-				Comment: class.JsonComment{
-					GormComment: comment.GormComment,
-					CreateDate:  setting.CommentTimeString(comment.CreateDate),
-				},
+				Comment:  comment,
 			})
 
 			return
@@ -109,7 +106,7 @@ func CommentList(c *gin.Context) {
 	})
 }
 
-func GetCommentList(videoId int64, token string) (list []class.JsonComment, ok bool) {
+func GetCommentList(videoId int64, token string) (list []class.Comment, ok bool) {
 	if _, ok = FindUserToken(token); !ok {
 		return nil, false
 	}

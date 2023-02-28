@@ -11,13 +11,8 @@ import (
 
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
-	Video(ctx context.Context, req *api.Video, callOptions ...callopt.Option) (r *api.Response, err error)
-	User(ctx context.Context, req *api.User, callOptions ...callopt.Option) (r *api.Response, err error)
-	FriendUser(ctx context.Context, req *api.FriendUser, callOptions ...callopt.Option) (r *api.Response, err error)
-	Comment(ctx context.Context, req *api.Comment, callOptions ...callopt.Option) (r *api.Response, err error)
-	UserVideoFavorite(ctx context.Context, req *api.UserVideoFavorite, callOptions ...callopt.Option) (r *api.Response, err error)
-	Relation(ctx context.Context, req *api.Relation, callOptions ...callopt.Option) (r *api.Response, err error)
-	Message(ctx context.Context, req *api.Message, callOptions ...callopt.Option) (r *api.Relation, err error)
+	FindComments(ctx context.Context, videoId int32, token string, callOptions ...callopt.Option) (r *api.Comment, err error)
+	ReviseComment(ctx context.Context, comment *api.Comment, callOptions ...callopt.Option) (r *api.Response, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -49,37 +44,12 @@ type kEchoClient struct {
 	*kClient
 }
 
-func (p *kEchoClient) Video(ctx context.Context, req *api.Video, callOptions ...callopt.Option) (r *api.Response, err error) {
+func (p *kEchoClient) FindComments(ctx context.Context, videoId int32, token string, callOptions ...callopt.Option) (r *api.Comment, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.Video(ctx, req)
+	return p.kClient.FindComments(ctx, videoId, token)
 }
 
-func (p *kEchoClient) User(ctx context.Context, req *api.User, callOptions ...callopt.Option) (r *api.Response, err error) {
+func (p *kEchoClient) ReviseComment(ctx context.Context, comment *api.Comment, callOptions ...callopt.Option) (r *api.Response, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.User(ctx, req)
-}
-
-func (p *kEchoClient) FriendUser(ctx context.Context, req *api.FriendUser, callOptions ...callopt.Option) (r *api.Response, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.FriendUser(ctx, req)
-}
-
-func (p *kEchoClient) Comment(ctx context.Context, req *api.Comment, callOptions ...callopt.Option) (r *api.Response, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.Comment(ctx, req)
-}
-
-func (p *kEchoClient) UserVideoFavorite(ctx context.Context, req *api.UserVideoFavorite, callOptions ...callopt.Option) (r *api.Response, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UserVideoFavorite(ctx, req)
-}
-
-func (p *kEchoClient) Relation(ctx context.Context, req *api.Relation, callOptions ...callopt.Option) (r *api.Response, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.Relation(ctx, req)
-}
-
-func (p *kEchoClient) Message(ctx context.Context, req *api.Message, callOptions ...callopt.Option) (r *api.Relation, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.Message(ctx, req)
+	return p.kClient.ReviseComment(ctx, comment)
 }

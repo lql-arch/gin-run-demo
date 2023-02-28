@@ -3,7 +3,6 @@ package controller
 import (
 	"douSheng/Const"
 	"douSheng/class"
-	"douSheng/service"
 	"douSheng/sql"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -80,7 +79,7 @@ func Login(c *gin.Context) {
 			Response: class.Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
 		})
 	}
-	go service.LoginReset()
+	go sql.LoginReset()
 	//go LoginReset()
 }
 

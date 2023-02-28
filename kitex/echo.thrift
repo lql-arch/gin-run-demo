@@ -73,15 +73,8 @@ struct Message {
 }
 
 service Echo {
-//    Response Video(1: Video req)
-//    Response User(1: User req)
-//    Response FriendUser(1: FriendUser req)
-//    Response Comment(1: Comment req)
-//    Response UserVideoFavorite(1: UserVideoFavorite req)
-//    Response Relation(1: Relation req)
-//    Response Message(1: Message req)
     Comment FindComments(1: i32 videoId ,2: string token)
     Response ReviseComment(1: Comment comment )
-    Response
+//    Response
 }
 

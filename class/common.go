@@ -25,24 +25,16 @@ type Video struct {
 	UpdateAt      int64  `json:"update_at" gorm:"column:update_at"`
 }
 
-type GormComment struct {
-	Id      int64  `json:"id,omitempty" gorm:"column:id"`
-	UserId  int64  `json:"user_id"`                                      //sql
-	Author  User   `json:"user" gorm:"foreignKey:id;references:user_id"` // 评论用户信息
-	Content string `json:"content,omitempty"`                            // 评论内容
-	VideoId int64  `json:"video_id"`                                     // 视频评论id
-	Type    int    `json:"type"`                                         // 2删除或1创建
-	CId     int64  `gorm:"<-:false" json:"c_id"`                         //只读,禁止写
-}
-
-type JsonComment struct {
-	GormComment
-	CreateDate string `json:"create_date,omitempty"` // 评论发布日期，格式 mm-dd
-}
-
 type Comment struct {
-	GormComment
-	CreateDate int64 `json:"create_date,omitempty"` // 评论发布日期，格式 mm-dd
+	Id             int64  `json:"id,omitempty" gorm:"column:id"`
+	UserId         int64  `json:"user_id"`                                      //sql
+	Author         User   `json:"user" gorm:"foreignKey:id;references:user_id"` // 评论用户信息
+	Content        string `json:"content,omitempty"`                            // 评论内容
+	VideoId        int64  `json:"video_id"`                                     // 视频评论id
+	Type           int    `json:"type"`                                         // 2删除或1创建
+	CId            int64  `gorm:"<-:false" json:"c_id"`                         //只读,禁止写
+	JSONCreateDate string `json:"create_date,omitempty" gorm:"column:abandon"`  // 评论发布日期，格式 mm-dd
+	CreateDate     int64  `json:"abandon,omitempty" gorm:"column:create_date"`  // 评论发布日期，格式 mm-dd
 }
 
 type User struct {

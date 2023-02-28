@@ -2,12 +2,11 @@ package main
 
 import (
 	api "douSheng/kitex/kitex_gen/api/echo"
-	service2 "douSheng/service"
 	"log"
 )
 
 func main() {
-	svr := api.NewServer(new(service2.EchoImpl))
+	svr := api.NewServer(new(EchoImpl))
 
 	err := svr.Run()
 

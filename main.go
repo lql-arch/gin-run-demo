@@ -1,13 +1,14 @@
 package main
 
 import (
+	kClient "douSheng/KClient"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	_ "net/http/pprof"
 )
 
 func main() {
-	//go kClient.KClient()
+	go kClient.KClient()
 
 	r := gin.Default()
 

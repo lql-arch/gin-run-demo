@@ -7,9 +7,7 @@ import (
 	"log"
 )
 
-func FindComments(videoId int64, token string) (comments []class.JsonComment) {
-	var tmpComments []class.Comment
-
+func FindComments(videoId int64, token string) (comments []class.Comment) {
 	users := make(map[int64]class.User)
 	myUser, _ := FindUser(token)
 
@@ -17,17 +15,11 @@ func FindComments(videoId int64, token string) (comments []class.JsonComment) {
 	result := db.Table("comment c").Preload("Author").
 		Select("c.user_id, c.id as c_id , c.content, c.create_date, c.video_id,u.*").
 		Joins("left join user u on c.user_id = u.id").
-		Where("c.video_id = ?", videoId).Order("create_date").Find(&tmpComments)
-
-	for i := range tmpComments {
-		var comment = class.JsonComment{
-			GormComment: tmpComments[i].GormComment,
-			CreateDate:  setting.CommentTimeString(tmpComments[i].CreateDate),
-		}
-		comments = append(comments, comment)
-	}
+		Where("c.video_id = ?", videoId).Order("create_date").Find(&comments)
 
 	for i := range comments {
+		comments[i].JSONCreateDate = setting.CommentTimeString(comments[i].CreateDate)
+
 		comments[i].Id = comments[i].CId
 
 		user, ok := users[comments[i].Id] // 自己与目标用户关系

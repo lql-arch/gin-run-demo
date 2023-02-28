@@ -19,13 +19,8 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "Echo"
 	handlerType := (*api.Echo)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"Video":             kitex.NewMethodInfo(videoHandler, newEchoVideoArgs, newEchoVideoResult, false),
-		"User":              kitex.NewMethodInfo(userHandler, newEchoUserArgs, newEchoUserResult, false),
-		"FriendUser":        kitex.NewMethodInfo(friendUserHandler, newEchoFriendUserArgs, newEchoFriendUserResult, false),
-		"Comment":           kitex.NewMethodInfo(commentHandler, newEchoCommentArgs, newEchoCommentResult, false),
-		"UserVideoFavorite": kitex.NewMethodInfo(userVideoFavoriteHandler, newEchoUserVideoFavoriteArgs, newEchoUserVideoFavoriteResult, false),
-		"Relation":          kitex.NewMethodInfo(relationHandler, newEchoRelationArgs, newEchoRelationResult, false),
-		"Message":           kitex.NewMethodInfo(messageHandler, newEchoMessageArgs, newEchoMessageResult, false),
+		"FindComments":  kitex.NewMethodInfo(findCommentsHandler, newEchoFindCommentsArgs, newEchoFindCommentsResult, false),
+		"ReviseComment": kitex.NewMethodInfo(reviseCommentHandler, newEchoReviseCommentArgs, newEchoReviseCommentResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "api",
@@ -41,130 +36,40 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	return svcInfo
 }
 
-func videoHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*api.EchoVideoArgs)
-	realResult := result.(*api.EchoVideoResult)
-	success, err := handler.(api.Echo).Video(ctx, realArg.Req)
+func findCommentsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*api.EchoFindCommentsArgs)
+	realResult := result.(*api.EchoFindCommentsResult)
+	success, err := handler.(api.Echo).FindComments(ctx, realArg.VideoId, realArg.Token)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newEchoVideoArgs() interface{} {
-	return api.NewEchoVideoArgs()
+func newEchoFindCommentsArgs() interface{} {
+	return api.NewEchoFindCommentsArgs()
 }
 
-func newEchoVideoResult() interface{} {
-	return api.NewEchoVideoResult()
+func newEchoFindCommentsResult() interface{} {
+	return api.NewEchoFindCommentsResult()
 }
 
-func userHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*api.EchoUserArgs)
-	realResult := result.(*api.EchoUserResult)
-	success, err := handler.(api.Echo).User(ctx, realArg.Req)
+func reviseCommentHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*api.EchoReviseCommentArgs)
+	realResult := result.(*api.EchoReviseCommentResult)
+	success, err := handler.(api.Echo).ReviseComment(ctx, realArg.Comment)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newEchoUserArgs() interface{} {
-	return api.NewEchoUserArgs()
+func newEchoReviseCommentArgs() interface{} {
+	return api.NewEchoReviseCommentArgs()
 }
 
-func newEchoUserResult() interface{} {
-	return api.NewEchoUserResult()
-}
-
-func friendUserHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*api.EchoFriendUserArgs)
-	realResult := result.(*api.EchoFriendUserResult)
-	success, err := handler.(api.Echo).FriendUser(ctx, realArg.Req)
-	if err != nil {
-		return err
-	}
-	realResult.Success = success
-	return nil
-}
-func newEchoFriendUserArgs() interface{} {
-	return api.NewEchoFriendUserArgs()
-}
-
-func newEchoFriendUserResult() interface{} {
-	return api.NewEchoFriendUserResult()
-}
-
-func commentHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*api.EchoCommentArgs)
-	realResult := result.(*api.EchoCommentResult)
-	success, err := handler.(api.Echo).Comment(ctx, realArg.Req)
-	if err != nil {
-		return err
-	}
-	realResult.Success = success
-	return nil
-}
-func newEchoCommentArgs() interface{} {
-	return api.NewEchoCommentArgs()
-}
-
-func newEchoCommentResult() interface{} {
-	return api.NewEchoCommentResult()
-}
-
-func userVideoFavoriteHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*api.EchoUserVideoFavoriteArgs)
-	realResult := result.(*api.EchoUserVideoFavoriteResult)
-	success, err := handler.(api.Echo).UserVideoFavorite(ctx, realArg.Req)
-	if err != nil {
-		return err
-	}
-	realResult.Success = success
-	return nil
-}
-func newEchoUserVideoFavoriteArgs() interface{} {
-	return api.NewEchoUserVideoFavoriteArgs()
-}
-
-func newEchoUserVideoFavoriteResult() interface{} {
-	return api.NewEchoUserVideoFavoriteResult()
-}
-
-func relationHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*api.EchoRelationArgs)
-	realResult := result.(*api.EchoRelationResult)
-	success, err := handler.(api.Echo).Relation(ctx, realArg.Req)
-	if err != nil {
-		return err
-	}
-	realResult.Success = success
-	return nil
-}
-func newEchoRelationArgs() interface{} {
-	return api.NewEchoRelationArgs()
-}
-
-func newEchoRelationResult() interface{} {
-	return api.NewEchoRelationResult()
-}
-
-func messageHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*api.EchoMessageArgs)
-	realResult := result.(*api.EchoMessageResult)
-	success, err := handler.(api.Echo).Message(ctx, realArg.Req)
-	if err != nil {
-		return err
-	}
-	realResult.Success = success
-	return nil
-}
-func newEchoMessageArgs() interface{} {
-	return api.NewEchoMessageArgs()
-}
-
-func newEchoMessageResult() interface{} {
-	return api.NewEchoMessageResult()
+func newEchoReviseCommentResult() interface{} {
+	return api.NewEchoReviseCommentResult()
 }
 
 type kClient struct {
@@ -177,71 +82,22 @@ func newServiceClient(c client.Client) *kClient {
 	}
 }
 
-func (p *kClient) Video(ctx context.Context, req *api.Video) (r *api.Response, err error) {
-	var _args api.EchoVideoArgs
-	_args.Req = req
-	var _result api.EchoVideoResult
-	if err = p.c.Call(ctx, "Video", &_args, &_result); err != nil {
+func (p *kClient) FindComments(ctx context.Context, videoId int32, token string) (r *api.Comment, err error) {
+	var _args api.EchoFindCommentsArgs
+	_args.VideoId = videoId
+	_args.Token = token
+	var _result api.EchoFindCommentsResult
+	if err = p.c.Call(ctx, "FindComments", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) User(ctx context.Context, req *api.User) (r *api.Response, err error) {
-	var _args api.EchoUserArgs
-	_args.Req = req
-	var _result api.EchoUserResult
-	if err = p.c.Call(ctx, "User", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-
-func (p *kClient) FriendUser(ctx context.Context, req *api.FriendUser) (r *api.Response, err error) {
-	var _args api.EchoFriendUserArgs
-	_args.Req = req
-	var _result api.EchoFriendUserResult
-	if err = p.c.Call(ctx, "FriendUser", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-
-func (p *kClient) Comment(ctx context.Context, req *api.Comment) (r *api.Response, err error) {
-	var _args api.EchoCommentArgs
-	_args.Req = req
-	var _result api.EchoCommentResult
-	if err = p.c.Call(ctx, "Comment", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-
-func (p *kClient) UserVideoFavorite(ctx context.Context, req *api.UserVideoFavorite) (r *api.Response, err error) {
-	var _args api.EchoUserVideoFavoriteArgs
-	_args.Req = req
-	var _result api.EchoUserVideoFavoriteResult
-	if err = p.c.Call(ctx, "UserVideoFavorite", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-
-func (p *kClient) Relation(ctx context.Context, req *api.Relation) (r *api.Response, err error) {
-	var _args api.EchoRelationArgs
-	_args.Req = req
-	var _result api.EchoRelationResult
-	if err = p.c.Call(ctx, "Relation", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-
-func (p *kClient) Message(ctx context.Context, req *api.Message) (r *api.Relation, err error) {
-	var _args api.EchoMessageArgs
-	_args.Req = req
-	var _result api.EchoMessageResult
-	if err = p.c.Call(ctx, "Message", &_args, &_result); err != nil {
+func (p *kClient) ReviseComment(ctx context.Context, comment *api.Comment) (r *api.Response, err error) {
+	var _args api.EchoReviseCommentArgs
+	_args.Comment = comment
+	var _result api.EchoReviseCommentResult
+	if err = p.c.Call(ctx, "ReviseComment", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

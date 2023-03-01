@@ -33,7 +33,7 @@ type Comment struct {
 	VideoId        int64  `json:"video_id"`                                     // 视频评论id
 	Type           int    `json:"type"`                                         // 2删除或1创建
 	CId            int64  `gorm:"<-:false" json:"c_id"`                         //只读,禁止写
-	JSONCreateDate string `json:"create_date,omitempty" gorm:"column:abandon"`  // 评论发布日期，格式 mm-dd
+	JSONCreateDate string `json:"create_date,omitempty" gorm:"-:all"`  // 评论发布日期，格式 mm-dd
 	CreateDate     int64  `json:"abandon,omitempty" gorm:"column:create_date"`  // 评论发布日期，格式 mm-dd
 }
 

@@ -2,159 +2,75 @@ package controller
 
 import (
 	"bytes"
-	"douSheng/Const"
-	"douSheng/class"
-	"douSheng/setting"
-	"douSheng/sql"
+	"douSheng/cmd/class"
+	"douSheng/cmd/publish/kitex_gen/api"
+	"douSheng/cmd/rpc"
 	"fmt"
-	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
-	ffmpeg "github.com/u2takey/ffmpeg-go"
+	"io"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
-	"strings"
-	"time"
 )
 
 type VideoListResponse struct {
 	class.Response
 	VideoList []class.Video `json:"video_list"`
-	NextTime  int64         `json:"next_time"`
+	//NextTime  int64         `json:"next_time"`
 }
 
 // Publish 需要事务,1未处理
 // Publish check token then save upload file to public_videos directory
 func Publish(c *gin.Context) {
-	log.Println("Publish 需要事务,1未处理")
 	token := c.PostForm("token")
 	title := c.PostForm("title")
-
-	user, exist := sql.FindUser(token)
-	if !exist {
-		c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
-		return
-	}
-
-	//得到文件信息
 	data, err := c.FormFile("data")
 
 	if err != nil {
-		c.JSON(http.StatusOK, class.Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
+		c.JSON(http.StatusOK, Errorf(fmt.Errorf("上传的文件异常")))
 		return
 	}
 
-	//得到文件名
-	filename := filepath.Base(data.Filename)
-
-	//构建新文件名
-	finalName := fmt.Sprintf("%d_%d_%s", user.Id, setting.VideoIds, filename)
-	setting.VideoIds++
-
-	//构建文件保持地址
-	saveFile := filepath.Join("./public_videos/", finalName)
-
-	// 保存文件data到saverFile文件里
-	if err := c.SaveUploadedFile(data, saveFile); err != nil {
-		c.JSON(http.StatusOK, class.Response{
-			StatusCode: 1,
-			StatusMsg:  "saveVideo:" + err.Error(),
-		})
+	file, err := data.Open()
+	if err != nil {
+		c.JSON(http.StatusOK, Errorf(fmt.Errorf("上传的文件异常")))
 		return
 	}
+	defer file.Close()
 
-	//保存封面并且判断是否是视频
-	tmpCover, err := GetSnapshot(saveFile, filename, 1)
-	if err != nil { // 如果无法截图就说明文件有误
-		log.Println(err)
-		if err = os.Remove(saveFile); err != nil {
-			log.Println(err)
-		}
-		c.JSON(http.StatusOK, class.Response{
-			StatusCode: 0,
-			StatusMsg:  finalName + "不正确,请确认文件类型",
-		})
-		return
-	}
-	CoverPath := Const.ServiceUrl + "/jpg/" + tmpCover
-
-	filePath := Const.ServiceUrl + "/static/" + finalName
-	// 检查文件是否存在,存在更新文件退出(应成替换,而非更新)
-	if flag := sql.FindVideoByFile(filePath, user); flag {
-		c.JSON(http.StatusOK, class.Response{
-			StatusCode: 0,
-			StatusMsg:  finalName + " renew successfully",
-		})
-		return
-	}
-	// 存储文件地址到video数据库
-	videoId, ok := sql.InsertVideo(filePath, user, title, time.Now().Unix(), CoverPath)
-	if ok != nil {
-		c.JSON(http.StatusOK, class.Response{
-			StatusCode: 1,
-			StatusMsg:  ok.Error(),
-		})
-		return
-	}
-
-	// 存储文件信息到public数据库
-	if err = sql.InsertPublic(token, videoId); err != nil {
-		c.JSON(http.StatusOK, class.Response{
-			StatusCode: 1,
-			StatusMsg:  ok.Error(),
-		})
-		return
-	}
-
-	// 修改作品数目(+1)
-	sql.InsertUserPublicCount(user.Id, true)
-
-	c.JSON(http.StatusOK, class.Response{
-		StatusCode: 0,
-		StatusMsg:  finalName + " uploaded successfully",
-	})
-}
-
-func GetSnapshot(videoPath, snapshotPath string, frameNum int) (snapshotName string, err error) {
 	buf := bytes.NewBuffer(nil)
-
-	err = ffmpeg.Input(videoPath).
-		Filter("select", ffmpeg.Args{
-			fmt.Sprintf("gte(n,%d)", frameNum),
-		}).Output("pipe:", ffmpeg.KwArgs{
-		"vframes": 1, "format": "image2", "vcodec": "mjpeg",
-	}).WithOutput(buf, os.Stdout).Run()
-	if err != nil {
-		return "", fmt.Errorf("生成图失败：%v", err)
+	if _, err := io.Copy(buf, file); err != nil {
+		c.JSON(http.StatusOK, Errorf(fmt.Errorf("保存文件出错")))
+		return
 	}
 
-	img, err := imaging.Decode(buf)
-	if err != nil {
-		return "", fmt.Errorf("生成图失败：%v", err)
+	videoData := &api.VideoData{
+		Title:    title,
+		Data:     buf.Bytes(),
+		FileName: filepath.Base(data.Filename),
 	}
 
-	err = imaging.Save(img, "./public_cover/"+snapshotPath+".png")
+	resp, err := rpc.PublishAction(c, token, videoData)
+
 	if err != nil {
-		return "", fmt.Errorf("生成图失败：%v", err)
+		c.JSON(http.StatusOK, Errorf(err))
+		return
 	}
 
-	names := strings.Split(snapshotPath, "\\")
-	snapshotName = names[len(names)-1] + ".png"
+	c.JSON(http.StatusOK, resp)
 	return
 }
 
 func PublishList(c *gin.Context) {
 	token := c.Query("token")
 
-	c.JSON(http.StatusOK, VideoListResponse{
-		Response: class.Response{
-			StatusCode: 0,
-		},
-		VideoList: sql.ReadPublishVideos(token),
-	})
+	resp, err := rpc.PublishList(c, token)
 
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, *Errorf(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
 }

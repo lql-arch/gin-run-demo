@@ -1,21 +1,21 @@
 package sql
 
 import (
-	"douSheng/class"
+	"douSheng/cmd/class"
 	"gorm.io/gorm"
 	"log"
 )
 
-// 登录后必须置空
-var follows map[int64]struct{}
+// 登录后必须置空-> 每个用户各自存储
+var follows map[int64]map[int64]struct{}
 
 func init() {
-	follows = make(map[int64]struct{})
+	follows = make(map[int64]map[int64]struct{})
 }
 
-// Reset 置空关注状态
-func Reset() {
-	follows = make(map[int64]struct{})
+// Reset 置空对于id用户的关注状态
+func Reset(userId int64) {
+	follows[userId] = make(map[int64]struct{})
 }
 
 // RelationAction 根据state判断添加或者取消关注
@@ -74,7 +74,7 @@ func IsRelationExist(relation class.Relation) bool {
 	return true
 }
 
-func FindFollowUsers(userId int64, token string) (users []class.User) {
+func FindFollowUsers(userId int64, token string) (users []*class.User) {
 	if err := CheckUser(userId, token); err != nil {
 		log.Println(err)
 		return nil
@@ -84,16 +84,17 @@ func FindFollowUsers(userId int64, token string) (users []class.User) {
 		Joins("left join relation r on user.id = r.other_user_id").
 		Where("my_id = ? and r.state = ?", userId, 1).Find(&users)
 
-	Reset()
+	// 置空我的好友缓存
+	Reset(userId)
 	for i := range users {
-		follows[users[i].Id] = struct{}{}
+		follows[userId][users[i].Id] = struct{}{}
 		users[i].IsFollow = true
 	}
 
 	return users
 }
 
-func FindFollowerUsers(userId int64, token string) (users []class.User) {
+func FindFollowerUsers(userId int64, token string) (users []*class.User) {
 	_ = FindFollowUsers(userId, token)
 
 	if err := CheckUser(userId, token); err != nil {
@@ -111,18 +112,15 @@ func FindFollowerUsers(userId int64, token string) (users []class.User) {
 		} else {
 			users[i].IsFollow = false
 		}
-		follows[users[i].Id] = struct{}{}
+		follows[userId][users[i].Id] = struct{}{}
 	}
 
 	return users
 }
 
 // FindFriends 只有我关注且关注我的才能看见
-func FindFriends(userId int64, token string) (userFriends []class.FriendUser) {
-	var followUsers []class.User
-	//var followerUsers []class.User
-	// follows用于避免关注者和粉丝重复
-	follows, followUsers = class.UserSetByUserSlice(userId, token, FindFollowUsers)
+func FindFriends(userId int64, token string) (userFriends []*class.FriendUser) {
+	followUsers := FindFollowUsers(userId, token)
 	followers, _ := class.UserSetByUserSlice(userId, token, FindFollowerUsers)
 
 	// 我的关注者
@@ -134,7 +132,7 @@ func FindFriends(userId int64, token string) (userFriends []class.FriendUser) {
 		var message class.Message
 		db.Where("(my_id = ? and to_user_id = ?) or (my_id = ? and to_user_id = ?)", userId, user.Id, user.Id, userId).Order("create_at DESC").Limit(1).Find(&message)
 
-		var friendMessage class.FriendUser
+		friendMessage := new(class.FriendUser)
 		friendMessage.User = user
 		friendMessage.Message = message.Message
 		if message.MyId == userId { //1 => 当前请求用户发送的消息
@@ -161,7 +159,7 @@ func FindFriends(userId int64, token string) (userFriends []class.FriendUser) {
 	//
 	//	var friendMessage class.FriendUser
 	//	friendMessage.Message = message.Message
-	//	friendMessage.User = user
+	//	friendMessage.user = user
 	//	if message.MyId == userId { //1 => 当前请求用户发送的消息
 	//		friendMessage.MsgType = 1
 	//	} else { //0 => 当前请求用户接收的消息

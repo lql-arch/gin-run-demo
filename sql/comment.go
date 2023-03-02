@@ -1,13 +1,14 @@
 package sql
 
 import (
-	"douSheng/class"
+	"douSheng/cmd/class"
 	"douSheng/setting"
+	"fmt"
 	"gorm.io/gorm"
 	"log"
 )
 
-func FindComments(videoId int64, token string) (comments []class.Comment) {
+func FindComments(videoId int64, token string) (comments []*class.Comment) {
 	users := make(map[int64]class.User)
 	myUser, _ := FindUser(token)
 
@@ -49,24 +50,33 @@ func FindComments(videoId int64, token string) (comments []class.Comment) {
 // ReviseComment 根据actionType状态添加或者删除comment到数据库
 func ReviseComment(comment class.Comment) (int64, error) {
 	var result *gorm.DB
+	var err error
 
 	if comment.Type == 1 { // 添加
+		err = fmt.Errorf("添加评论失败")
 		result = db.Create(&comment)
 
 		if result.RowsAffected == 0 {
-			return comment.Id, result.Error
+			return comment.Id, err
 		}
 
 		result = db.Model(&class.Video{}).Where("id = ?", comment.VideoId).Update("comment_count", gorm.Expr("comment_count + 1"))
+		if result.RowsAffected == 0 {
+			return comment.Id, err
+		}
 	} else { // 删除
+		err = fmt.Errorf("删除评论失败")
 		result = db.Where("id = ?", comment.Id).Delete(&class.Comment{})
 
 		if result.RowsAffected == 0 {
-			return comment.Id, result.Error
+			return comment.Id, err
 		}
 
 		result = db.Model(&class.Video{}).Where("id = ?", comment.VideoId).Update("comment_count", gorm.Expr("comment_count - 1"))
+		if result.RowsAffected == 0 {
+			return comment.Id, err
+		}
 	}
 
-	return comment.Id, result.Error
+	return comment.Id, nil
 }

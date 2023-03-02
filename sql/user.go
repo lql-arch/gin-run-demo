@@ -1,7 +1,7 @@
 package sql
 
 import (
-	"douSheng/class"
+	"douSheng/cmd/class"
 	"gorm.io/gorm"
 )
 
@@ -16,41 +16,15 @@ func FindUser(token string) (class.User, bool) {
 	return user, true
 }
 
-// FindUserIdSequence 取数据库中id的最大值(用于添加新数据),而不是拥有的数量
-func FindUserIdSequence() int64 {
-	var user class.User
-	db.Select("id").Where("").Limit(1).Order("id DESC").Find(&user)
-	return user.Id
-}
-
-func Info() map[string]class.User {
-	ans := make(map[string]class.User)
-
-	var users []class.User
-	db.Where("").Find(&users)
-
-	for _, user := range users {
-		ans[user.Token] = user
-	}
-
-	return ans
-}
-
 // InsertUser 添加数据到数据库
-func InsertUser(users []class.User) ([]int64, error) {
+func InsertUser(users *[]class.User) ([]class.User, error) {
 	result := db.Create(&users)
 
 	if result.RowsAffected == 0 {
 		return nil, result.Error
 	}
 
-	var ids []int64
-
-	for _, user := range users {
-		ids = append(ids, user.Id)
-	}
-
-	return ids, nil
+	return *users, nil
 }
 
 func GetUserByToken(token string) class.User {
@@ -77,12 +51,12 @@ func GetUserIdByVideoId(id int64) class.User {
 	return user
 }
 
-func InsertUserPublicCount(id int64, flag bool) {
-
+func InsertUserPublicCount(id int64, flag bool) error {
+	var err error
 	if flag { // 增加
-		db.Model(&class.User{}).Where("id = ?", id).Update("work_count", gorm.Expr("work_count + 1"))
+		err = db.Model(&class.User{}).Where("id = ?", id).Update("work_count", gorm.Expr("work_count + 1")).Error
 	} else { // 删除
-		db.Model(&class.User{}).Where("id = ?", id).Update("work_count", gorm.Expr("work_count - 1"))
+		err = db.Model(&class.User{}).Where("id = ?", id).Update("work_count", gorm.Expr("work_count - 1")).Error
 	}
-
+	return err
 }

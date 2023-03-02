@@ -1,9 +1,11 @@
 package controller
 
 import (
-	"douSheng/class"
-	"douSheng/sql"
+	"douSheng/cmd/class"
+	"douSheng/cmd/feed/kitex_gen/api"
+	"douSheng/cmd/rpc"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -11,8 +13,8 @@ import (
 
 type FeedResponse struct {
 	class.Response
-	VideoList []class.Video `json:"video_list,omitempty"`
-	NextTime  int64         `json:"next_time,omitempty"`
+	VideoList []*api.Video `json:"video_list,omitempty"`
+	NextTime  int64        `json:"next_time,omitempty"`
 }
 
 func Feed(c *gin.Context) {
@@ -22,14 +24,17 @@ func Feed(c *gin.Context) {
 		latestTime = time.Now().Unix()
 	}
 
-	list, nextTime := sql.ReadVideos(latestTime, token)
+	//list, nextTime := sql.ReadVideos(latestTime, token)
+	list, err := rpc.Feed(c, latestTime, token)
 
-	if nextTime == 0 {
-		nextTime = time.Now().Unix()
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, *Errorf(err))
+		return
 	}
-	c.JSON(http.StatusOK, FeedResponse{
-		Response:  class.Response{StatusCode: 0},
-		VideoList: list,
-		NextTime:  nextTime,
-	})
+
+	if list.NextTime == 0 {
+		list.NextTime = time.Now().Unix()
+	}
+	c.JSON(http.StatusOK, list)
 }

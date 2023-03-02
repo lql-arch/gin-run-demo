@@ -20,6 +20,38 @@
 > 开发环境为linux/amd64   
 > 使用数据库为 mysql Ver 15.1 Distrib 10.10.3-MariaDB, for Linux (x86_64) using readline 5.1
 
+```shell
+go build ./cmd/HttpService/main.go && ./main
+```
+
+```shell
+go build ./cmd/feed/feedMain.go && ./feedMain
+```
+
+```shell
+go build ./cmd/user/userMain.go && ./userMain
+```
+
+```shell
+go build ./cmd/publish/publishMain.go && ./publishMain
+```
+
+```shell
+go build ./cmd/favorite/favoriteMain.go && ./favoriteMain
+```
+
+```shell
+go build ./cmd/comment/commentMain.go && ./commentMain
+```
+
+```shell
+go build ./cmd/relation/relationMain.go && ./relationMain
+```
+
+```shell
+go build ./cmd/message/messageMain.go && ./messageMain
+```
+
 ### 一些注意
 
 - 使用gorm预编译防止sql注入
@@ -27,13 +59,14 @@
 - 使用jwt-go用账户和密码生成token.
 
 ### 项目分层功能说明
-- Class : 项目使用的数据结构
+- cmd : 各个服务器及其handler
+  - HttpService为http服务器
+  - Class : 项目连接数据库使用的数据结构
+  - rpc : 服务器之间连接的rpc服务启动
 - Const : 项目启动前,需要配置的一些参数
 - Controller : 项目的业务逻辑层
-- KClient/kitexService/kitex : 预计未来使用的kitex设计
 - public_cover : 存储视频封面或者用户封面的目录,预计未来将分离.
 - public_videos : 存储视频的目录,预计未来将分离.
-- Service : 包含使用kitex和一些检测修改服务器的设计.
 - Setting : 目前使用中的参数设置,预计未来合并入Const.
 - Sql : 项目的持久化层,将数据读取,存储,修改入数据库.
 - sqlStatement : 一些sql代码,包含mysql的初始化文件(DDL).
@@ -42,9 +75,9 @@
 yeyr2 : 全部(悲)
 
 ### 项目进度
-> 当前 : 单体架构  
+> 当前 : 单体架构(完成) -> 初步完成微服务(完成)
 > 预期 : 微服务  
-> 当前目标 : 添加kitex使用gRPC连接业务逻辑层与持久化层(数据库) -> 添加redis缓存层
+> 当前目标 : 添加kitex使用gRPC连接业务逻辑层与持久化层(数据库)(完成) -> 添加redis缓存层
 
 ### [函数接口文档](funcJoggle.md)(未完成)
 

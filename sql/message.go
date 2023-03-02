@@ -1,11 +1,12 @@
 package sql
 
 import (
-	"douSheng/class"
+	"douSheng/cmd/class"
+	"fmt"
 )
 
-func MessageChat(fromUserId int64, toUserId int64, recentTime int64) ([]class.Message, int64) {
-	var messages []class.Message
+func MessageChat(fromUserId int64, toUserId int64, recentTime int64) ([]*class.Message, int64) {
+	var messages []*class.Message
 	db.
 		Where("((my_id = ? and to_user_id = ?) or (my_id = ? and to_user_id = ?)) and create_at > ?",
 			fromUserId, toUserId, toUserId, fromUserId, recentTime).
@@ -19,6 +20,11 @@ func MessageChat(fromUserId int64, toUserId int64, recentTime int64) ([]class.Me
 	return messages, recentTime
 }
 
-func InsertMessage(message class.Message) {
-	db.Create(&message)
+func InsertMessage(message class.Message) error {
+	result := db.Create(&message)
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("发送出错")
+	}
+	return nil
 }

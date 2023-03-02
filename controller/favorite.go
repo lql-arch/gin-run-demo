@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"douSheng/class"
-	"douSheng/sql"
+	"douSheng/cmd/rpc"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -13,27 +13,27 @@ func FavoriteAction(c *gin.Context) {
 	videoID, _ := strconv.ParseInt(c.Query("video_id"), 0, 64)
 	actionType, _ := strconv.Atoi(c.Query("action_type"))
 
-	if _, exist := sql.FindUser(token); !exist {
-		c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+	resp, err := rpc.FavoriteAction(c, token, videoID, actionType)
+
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, *Errorf(err))
 		return
 	}
 
-	if err := sql.FavoriteAction(token, videoID, actionType); err != nil {
-		c.JSON(http.StatusOK, class.Response{StatusCode: 1, StatusMsg: "关注失败"})
-		return
-	}
-
-	c.JSON(http.StatusOK, class.Response{StatusCode: 0})
+	c.JSON(http.StatusOK, resp)
 }
 
 func FavoriteList(c *gin.Context) {
 	token := c.Query("token")
-	if token != "" {
-		c.JSON(http.StatusOK, VideoListResponse{
-			Response: class.Response{
-				StatusCode: 0,
-			},
-			VideoList: sql.ReadFavoriteVideos(token),
-		})
+
+	resp, err := rpc.FavoriteList(c, token)
+
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, *Errorf(err))
+		return
 	}
+
+	c.JSON(http.StatusOK, resp)
 }

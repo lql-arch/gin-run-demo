@@ -1,7 +1,7 @@
 package sql
 
 import (
-	"douSheng/class"
+	"douSheng/cmd/class"
 	"douSheng/setting"
 	"fmt"
 	"log"
@@ -20,10 +20,9 @@ func UpdateVideoData() {
 	}
 }
 
-func ReadVideos(latestTime int64, token string) ([]class.Video, int64) {
-	//db = getDB().Begin()
-	var videos []class.Video
-	nextTime := int64(0)
+func ReadVideos(latestTime int64, token string) ([]*class.Video, int64, error) {
+	var err error
+	videos := make([]*class.Video, 0)
 
 	// 获取自身信息
 	var myUser class.User
@@ -37,21 +36,30 @@ func ReadVideos(latestTime int64, token string) ([]class.Video, int64) {
 	// 随机取30个视频,不足则乱序取全部
 	if setting.VideoIds < 30 {
 		latestTime = time.Now().Unix()
-		db.Table("videos v").Preload("Author").
+		err = db.Table("videos v").Preload("Author").
 			Select("v.id,v.`author_id`,v.`play_url`,v.`cover_url`,v.`favorite_count`,v.`comment_count`,v.title,v.create_at,v.update_at,u.id as uid,u.name,u.follow_count,u.follower_count,u.token,u.background_image,u.avatar,u.signature,u.total_favorited,u.work_count,u.favorited_count").
 			Joins("left join user u on v.author_id = u.id").
-			Where("update_at <= ?", latestTime).Order("update_at DESC").Find(&videos)
+			Where("update_at <= ?", latestTime).Order("update_at DESC").Find(&videos).Error
 	} else {
-		db.Table("videos v").Preload("Author").
+		err = db.Table("videos v").Preload("Author").
 			Select("v.id,v.`author_id`,v.`play_url`,v.`cover_url`,v.`favorite_count`,v.`comment_count`,v.title,v.create_at,v.update_at,u.id as uid,u.name,u.follow_count,u.follower_count,u.token,u.background_image,u.avatar,u.signature,u.total_favorited,u.work_count,u.favorited_count").
 			Joins("left join user u on v.author_id = u.id").
-			Where("update_at <= ?", latestTime).Order("update_at DESC").Limit(30).Find(&videos)
+			Where("update_at <= ?", latestTime).Order("update_at DESC").Limit(30).Find(&videos).Error
+	}
+
+	if err != nil {
+		return nil, 0, err
 	}
 
 	for i := range videos {
 		if token != "" { // 如果有token
 			var userVideo class.UserVideoFavorite
 			result := db.Where("token = ? and video_id = ? and favorite_state = 1", token, videos[i].Id).Find(&userVideo)
+
+			if result.Error != nil {
+				return nil, 0, result.Error
+			}
+
 			if result.RowsAffected != 0 {
 				videos[i].IsFavorite = true
 			} else {
@@ -67,39 +75,35 @@ func ReadVideos(latestTime int64, token string) ([]class.Video, int64) {
 			if myUser.Id == videos[i].Author.Id { // 自己与目标用户关系
 				videos[i].Author.IsFollow = false
 			} else {
-				result := db.Where("my_id = ? and other_user_id = ? and state = 1", myUser.Id, videos[i].Author.Id).Find(&class.Relation{}).RowsAffected
-				if result == 0 {
+				result := db.Where("my_id = ? and other_user_id = ? and state = 1", myUser.Id, videos[i].Author.Id).Find(&class.Relation{})
+				if result.Error != nil {
+					return nil, 0, result.Error
+				}
+				if result.RowsAffected == 0 {
 					videos[i].Author.IsFollow = false
 				} else {
 					videos[i].Author.IsFollow = true
 				}
 			}
 		}
-
-		if nextTime == 0 {
-			nextTime = videos[i].UpdateAt
-		} else {
-			tempTime := videos[i].UpdateAt
-			if tempTime < nextTime {
-				nextTime = tempTime
-			}
-		}
 	}
 
-	return videos, nextTime
+	nextTime := videos[len(videos)-1].UpdateAt
+
+	return videos, nextTime, err
 }
 
-func ReadFavoriteVideos(token string) []class.Video {
+func ReadFavoriteVideos(token string) []*class.Video {
 	videoIDs := GetFavoriteVideoIDByToken(token)
 
-	var videos []class.Video
+	var videos []*class.Video
 
 	// 获取自身信息
 	var myUser class.User
 	db.Where("token = ?", token).Find(&myUser)
 
 	for _, v := range videoIDs {
-		var video class.Video
+		var video *class.Video
 		var user class.User
 		db.Where("id = ?", v.VideoId).Find(&video)
 		db.Where("id = ?", video.AuthorId).Find(&user)
@@ -131,18 +135,30 @@ func ReadFavoriteVideos(token string) []class.Video {
 	return videos
 }
 
-func ReadPublishVideos(token string) []class.Video {
+func ReadPublishVideos(token string) ([]*class.Video, error) {
 	videoIDs := GetPublicVideoIDByToken(token)
 
-	var videos []class.Video
+	var err error
+	var videos []*class.Video
 	var user class.User
 	for _, v := range videoIDs {
-		var video class.Video
-		db.Where("id = ?", v.VideoId).Find(&video)
-		db.Where("id = ?", video.AuthorId).Find(&user)
+		var video *class.Video
+		err = db.Where("id = ?", v.VideoId).Find(&video).Error
+		if err != nil {
+			return nil, err
+		}
+
+		err = db.Where("id = ?", video.AuthorId).Find(&user).Error
+		if err != nil {
+			return nil, err
+		}
 
 		var userVideo class.UserVideoFavorite
-		db.Where("token = ? and video_id = ?", token, v.VideoId).Find(&userVideo)
+		err = db.Where("token = ? and video_id = ?", token, v.VideoId).Find(&userVideo).Error
+		if err != nil {
+			return nil, err
+		}
+
 		if userVideo.FavoriteState == 1 {
 			video.IsFavorite = true
 		} else {
@@ -154,7 +170,7 @@ func ReadPublishVideos(token string) []class.Video {
 		videos = append(videos, video)
 	}
 
-	return videos
+	return videos, err
 }
 
 func GetFavoriteVideoIDByToken(token string) (result []class.UserVideoFavorite) {

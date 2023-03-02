@@ -1,7 +1,7 @@
 package sql
 
 import (
-	"douSheng/class"
+	"douSheng/cmd/class"
 	"fmt"
 )
 

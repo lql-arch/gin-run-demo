@@ -1,7 +1,7 @@
 package sql
 
 import (
-	"douSheng/class"
+	"douSheng/cmd/class"
 	"gorm.io/gorm"
 	"log"
 )

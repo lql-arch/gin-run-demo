@@ -32,5 +32,14 @@ sqlStatement/select.sql
 Dockerfile
 test/douSheng
 
+main
+publishMain
+relationMain
+feedMain
+userMain
+messageMain
+commentMain
+favoriteMain
+
 
 .idea
